@@ -15,6 +15,7 @@ public class Server implements Runnable {
 	
 	public Server(int port) {
 		this.port = port;
+		Logger.debug = true;
 	}
 
 	@Override
@@ -29,6 +30,7 @@ public class Server implements Runnable {
     	
     	try {
 			serverSocket = new ServerSocket(port);
+			Logger.log(serverSocket.getInetAddress().getLocalHost().getHostAddress());
 		} catch (IOException e) {
 			System.err.println( "Error opening server socket: " + e.getMessage() );
 			e.printStackTrace();
@@ -48,7 +50,7 @@ public class Server implements Runnable {
 		} // end while
 		
 		try {
-			
+			System.out.println("Server is shutting down...");
 			serverSocket.close();
 			threadPool.shutdown();
 			
@@ -58,4 +60,9 @@ public class Server implements Runnable {
 			System.exit(3);
 		} // try catch
     } // run
+	
+	public static void main(String[] args) {
+		System.out.println("Server is running...");
+		new Server(5555).run();
+	} // main
 } // Server
