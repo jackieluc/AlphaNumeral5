@@ -13,6 +13,7 @@ public class RequestHandler implements Runnable {
 	public RequestHandler(Server p, Socket s) { 
 		this.parent = p;
 		this.socket	= s; 
+		Logger.debug = true;
 	}
 	
 	@Override
@@ -22,17 +23,35 @@ public class RequestHandler implements Runnable {
 			return;
 		
 		try {
-			DataInputStream ois = new DataInputStream( socket.getInputStream() );
-			DataOutputStream oos = new DataOutputStream( socket.getOutputStream() );
+			Logger.log("Connected to: " + socket.getInetAddress().toString());
+			DataInputStream dis = new DataInputStream(socket.getInputStream());
+			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
 			
-			String incoming	= ois.readUTF();
+			String incoming	= "";
 			
-			if (incoming.startsWith("Hello ")) {
+			while(!incoming.equals("quit")) {
+				incoming = dis.readUTF();
 				
-			} // if 
-			
+				Logger.log("Data at server: " + incoming);
+				
+				if (incoming.startsWith("signup ")) {
+					
+				} // if "signup"
+				
+				if (incoming.startsWith("login ")) {
+					
+				} // if "login"
+				
+				if (incoming.startsWith("move ")) {
+					String[] data = incoming.split(" ");
+					
+					for(int i = 0; i < data.length; i++)
+						Logger.log("data: " + i);
+					
+				} // if "move"
+			}
 		} catch (IOException e) {
-			System.err.println("ERROR: Cannot open input/output streams on this socket" + e.getMessage());
+			System.err.println("ERROR: Cannot open input/output streams on this socket: " + e.getMessage());
 			return;
 		}
 	} // run
