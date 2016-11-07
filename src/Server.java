@@ -30,10 +30,10 @@ public class Server implements Runnable {
     	
     	try {
 			serverSocket = new ServerSocket(port);
-			Logger.log(serverSocket.getInetAddress().getLocalHost().getHostAddress());
-		} catch (IOException e) {
-			System.err.println( "Error opening server socket: " + e.getMessage() );
-			e.printStackTrace();
+			Logger.log("Server is running on IP: " + serverSocket.getInetAddress().getLocalHost().getHostAddress() + " and port: " + port);
+		} catch (IOException IOError) {
+			System.err.println("Error opening server socket: ");
+			IOError.printStackTrace();
 			System.exit(1);
 		} // try catch
   
@@ -42,27 +42,28 @@ public class Server implements Runnable {
 		while(!stopServer) {
 			try {
 				threadPool.execute(new RequestHandler(this, serverSocket.accept()));
-			} catch (IOException e) {
-				System.err.println( "Error accepting connection from socket: " + e.getMessage() );
-				e.printStackTrace();
+			} catch (IOException IOError) {
+				System.err.println("Error accepting connection from socket: ");
+				IOError.printStackTrace();
 				System.exit(2);
 			} // try catch	
 		} // end while
 		
 		try {
-			System.out.println("Server is shutting down...");
+			
+			// clean up
+			Logger.log("Server is shutting down...");
 			serverSocket.close();
 			threadPool.shutdown();
 			
-		} catch (IOException e) {
-			System.err.println( "Error in closing server socket: " + e.getMessage() );
-			e.printStackTrace();
+		} catch (IOException IOError) {
+			System.err.println( "Error in closing server socket: ");
+			IOError.printStackTrace();
 			System.exit(3);
 		} // try catch
     } // run
 	
 	public static void main(String[] args) {
-		System.out.println("Server is running...");
 		new Server(5555).run();
 	} // main
 } // Server

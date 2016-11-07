@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.Random;
 
 public class RequestHandler implements Runnable {
 
 	private Server parent = null;
 	private Socket socket = null;
+	private Random randomNumber = new Random();
 	
 	public RequestHandler(Server p, Socket s) { 
 		this.parent = p;
@@ -19,39 +21,42 @@ public class RequestHandler implements Runnable {
 	@Override
 	public void run() {
 		
-		if (socket == null || parent == null)
+		if (socket == null || parent == null) {
+			System.err.println("Cannot connect to server socket or accept client socket.");
 			return;
+		}
 		
 		try {
 			Logger.log("Connected to: " + socket.getInetAddress().toString());
-			DataInputStream dis = new DataInputStream(socket.getInputStream());
-			DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
+			DataInputStream incomingData = new DataInputStream(socket.getInputStream());
+			DataOutputStream outgoingData = new DataOutputStream(socket.getOutputStream());
 			
 			String incoming	= "";
+			String outgoing = "";
+			
+			// we first accept the initial request of the client's name
+			incoming = incomingData.readUTF();
+			if(incoming.startsWith("hello ")) {
+				outgoingData.writeUTF("Hello " + incoming.substring(6));
+			}
+			
+			String clientName = incoming.substring(6);
 			
 			while(!incoming.equals("quit")) {
-				incoming = dis.readUTF();
+				incoming = incomingData.readUTF();
 				
-				Logger.log("Data at server: " + incoming);
+				Logger.log("Data from " + clientName + " : " + incoming);
 				
-				if (incoming.startsWith("signup ")) {
-					
-				} // if "signup"
-				
-				if (incoming.startsWith("login ")) {
-					
-				} // if "login"
-				
-				if (incoming.startsWith("move ")) {
-					String[] data = incoming.split(" ");
-					
-					for(int i = 0; i < data.length; i++)
-						Logger.log("data: " + i);
-					
-				} // if "move"
+				if(!incoming.equals("quit"))
+					outgoingData.writeUTF("To " + clientName + ", here's a random number: " + randomNumber.nextInt(1000));
 			}
-		} catch (IOException e) {
-			System.err.println("ERROR: Cannot open input/output streams on this socket: " + e.getMessage());
+			
+			System.out.println("Client: " + clientName + " decided to quit.");
+			socket.close();
+			
+		} catch (IOException IOError) {
+			System.err.println("ERROR: Cannot open input/output streams on this socket: ");
+			System.err.println(IOError.getMessage());
 			return;
 		}
 	} // run
