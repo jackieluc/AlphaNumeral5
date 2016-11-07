@@ -40,17 +40,18 @@ public class RequestHandler implements Runnable {
 			
 			String clientName = incoming.substring(6);
 			
-			while(!incoming.equals("quit")) {
+			while(true) {
 				incoming = incomingData.readUTF();
+				
+				if(incoming.equals("quit"))
+					break;
 				
 				Logger.log("Request from " + clientName + ": " + incoming);
 				
 				int randomNum = randomNumber.nextInt(1000);
 				
-				if(!incoming.equals("quit")) {
-					outgoingData.writeUTF("Response to " + clientName + ", here's a random number: " + randomNum);
-					Logger.log("Response to " + clientName + ", here's a random number: " + randomNum);
-				}
+				outgoingData.writeUTF("Response to " + clientName + ", here's a random number: " + randomNum);
+				Logger.log("Response to " + clientName + ", here's a random number: " + randomNum);
 			}
 			
 			System.out.println("Client: " + clientName + " decided to quit.");

@@ -38,15 +38,14 @@ public class Client {
 			System.out.println(incomingData.readUTF());
 
 			// client send requests and see responses from server until client wants to quit
-			boolean quit = false;
-			while(!quit) {
+			while(true) {
 				
 				outgoing = ui.nextLine();
 
 				outgoingData.writeUTF(outgoing);
 				if(outgoing.equals("quit")) {
-					quit = true;
 					Logger.log("You decided to quit.");
+					break;
 				}
 				
 				Logger.log("Request: " + outgoing);
