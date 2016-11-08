@@ -5,4 +5,7 @@ package game;
  */
 public class Player
 {
+    public static Player current;
+
+    public int x, y;
 }

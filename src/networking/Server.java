@@ -1,14 +1,14 @@
 package networking;
 
+import debug.Logger;
 import game.Player;
 import networking.commands.Command;
+import networking.commands.RegisterUserCommand;
 import networking.commands.WelcomeCommand;
 
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,14 +18,15 @@ import static debug.Logger.log;
 public class Server implements Runnable
 {
 	private int port = -1;
-    // List of players and their client managers
+    // All clients in game, key is username
+	public HashMap<String,ClientManager> inGameClients;
+	// List of players and their client managers
     public ArrayList<ClientManager> clients;
-    public Dictionary<Player, ClientManager> players;
 
     /**
      * Manages a client (Listens on another thread, sends commands)
      */
-	private class ClientManager implements Runnable
+	public class ClientManager implements Runnable
 	{
 		private Server server;
 		private Socket socket;
@@ -64,17 +65,18 @@ public class Server implements Runnable
 		{
 			Command command;
 
-            serializer.writeToSocket(new WelcomeCommand());
+            serializer.writeToSocket(new RegisterUserCommand(null));
 
 			while ((command = (Command) serializer.readFromSocket()) != null)
 			{
                 //
-                log("Command recieved from " + socket.getRemoteSocketAddress());
+                log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
 				//
 				if (command != null && command.verify())
 				{
-					command.updateServer(server);
+					Logger.log("Is valid command");
 					command.updateState();
+					command.updateServer(server,this);
 				}
 			}
 
@@ -86,6 +88,7 @@ public class Server implements Runnable
 	{
 		this.port = port;
         clients = new ArrayList<>(100);
+		inGameClients = new HashMap<String, ClientManager>();
 	}
 
     /**

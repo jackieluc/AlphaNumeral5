@@ -11,11 +11,6 @@ import java.io.Serializable;
  */
 public abstract class Command implements Serializable
 {
-    public static void read(InputStream in)
-    {
-
-    }
-
     /**
      * Check if this command is valid
      * @return Is a valid command
@@ -40,5 +35,5 @@ public abstract class Command implements Serializable
      * Updates the server
      * ONLY CALLED ON SERVER
      */
-    public void updateServer(Server server){}
+    public void updateServer(Server server, Server.ClientManager clientManager){}
 }

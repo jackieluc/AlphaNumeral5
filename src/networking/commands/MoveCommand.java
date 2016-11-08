@@ -10,7 +10,7 @@ import networking.Server;
 public class MoveCommand extends Command
 {
     @Override
-    public void updateServer(Server server)
+    public void updateServer(Server server, Server.ClientManager clientManager)
     {
         Logger.log("VALID MOVE COMMAND");
 

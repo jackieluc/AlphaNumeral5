@@ -1,6 +1,7 @@
 package networking;
 
 import java.net.Socket;
+import java.util.Scanner;
 
 import debug.Logger;
 import networking.commands.Command;
@@ -15,16 +16,32 @@ public class Client implements Runnable
     //
     private Socket socket;
     private Serializer serializer;
+    //
+    public String username;
 	
-	public Client(String s, int p)
+	public Client(String serverIP, int serverPort)
 	{
-		this.serverIP = s;
-		this.serverPort = p;
+		this.serverIP = serverIP;
+		this.serverPort = serverPort;
+        username = null;
 	}
+
+	public boolean isConnected()
+    {
+        return (username != null);
+    }
 
 	public void stop()
     {
 
+    }
+
+    public void send(Command command)
+    {
+        synchronized (socket)
+        {
+            serializer.writeToSocket(command);
+        }
     }
 
     @Override
@@ -34,17 +51,18 @@ public class Client implements Runnable
         {
             socket = new Socket(serverIP, serverPort);
             serializer = new Serializer(socket);
-            log("go");
+
             // Loop and wait for packets
             Command command;
             while ((command = (Command) serializer.readFromSocket()) != null)
             {
-                serializer.writeToSocket(new MoveCommand());
                 //
                 if (command != null)
                 {
-                    command.updateClient(this);
+                    Logger.log("Command recieved of type " + command);
+
                     command.updateState();
+                    command.updateClient(this);
                 }
             }
         }
