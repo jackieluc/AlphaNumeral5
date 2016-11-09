@@ -1,9 +1,11 @@
 package networking;
 
+import java.io.IOException;
 import java.net.Socket;
 import java.util.Scanner;
 
 import debug.Logger;
+import game.GameRenderer;
 import networking.commands.Command;
 import networking.commands.MoveCommand;
 
@@ -33,7 +35,7 @@ public class Client implements Runnable
 
 	public void stop()
     {
-
+        close();
     }
 
     public void send(Command command)
@@ -44,32 +46,76 @@ public class Client implements Runnable
         }
     }
 
+    /**
+     * The client listen loop
+     */
     @Override
     public void run()
+    {
+        // If can't connect, close and quit program
+        if (!connect())
+        {
+            close();
+            return;
+        }
+
+        // Create a serializer for this socket
+        serializer = new Serializer(socket);
+
+        // Loop and wait for packets
+        Command command;
+        while ((command = (Command) serializer.readFromSocket()) != null)
+        {
+            //
+            if (command != null)
+            {
+                log("Command recieved of type " + command);
+
+                command.updateState();
+                command.updateClient(this);
+            }
+        }
+
+        // TODO try to reconnect
+        log("Disconnected from server...");
+
+        // Close
+        close();
+    }
+
+    /**
+     * Tries to connect to a server
+     * @return whether connection was successful
+     */
+    private boolean connect()
     {
         try
         {
             socket = new Socket(serverIP, serverPort);
-            serializer = new Serializer(socket);
+            return true;
+        }
+        catch (IOException ex)
+        {
+            log("Error connecting to server");
+            log(ex);
+            return false;
+        }
+    }
 
-            // Loop and wait for packets
-            Command command;
-            while ((command = (Command) serializer.readFromSocket()) != null)
-            {
-                //
-                if (command != null)
-                {
-                    Logger.log("Command recieved of type " + command);
-
-                    command.updateState();
-                    command.updateClient(this);
-                }
-            }
+    /**
+     * Closes the socket and the gamerenderer
+     */
+    private void close()
+    {
+        try
+        {
+            if (socket != null) socket.close();
+            if (GameRenderer.current != null) GameRenderer.current.close();
         }
         catch (Exception ex)
         {
-            Logger.log("Error! Client has crashed!");
-            Logger.log(ex);
+            log("Error closing client!");
+            log(ex);
         }
     }
 }

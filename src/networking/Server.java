@@ -6,6 +6,7 @@ import networking.commands.Command;
 import networking.commands.RegisterUserCommand;
 import networking.commands.WelcomeCommand;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -28,16 +29,21 @@ public class Server implements Runnable
      */
 	public class ClientManager implements Runnable
 	{
+		public String username;
 		private Server server;
 		private Socket socket;
 		private Serializer serializer;
 
 		public ClientManager(Server server, Socket socket)
 		{
+			// reset username
+			this.username = null;
+			// set vars
 			this.server = server;
 			this.socket = socket;
 			serializer = new Serializer(socket);
 
+			// add to list of clients
             clients.add(this);
 
 			log("Connection from " + socket.getRemoteSocketAddress());
@@ -80,8 +86,29 @@ public class Server implements Runnable
 				}
 			}
 
-			log("socket closed");
+			// close everything
+			close();
 		}
+
+        /**
+         * Remove from lists and close socket
+         */
+		public void close()
+        {
+            try
+            {
+                clients.remove(this);
+                inGameClients.remove(username);
+                socket.close();
+
+                log("User \"" + username + "\" disconnected!");
+            }
+            catch (IOException ex)
+            {
+                log("Error closing client manager!");
+                log(ex);
+            }
+        }
 	}
 	
 	public Server(int port)

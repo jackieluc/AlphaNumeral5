@@ -1,6 +1,7 @@
 package networking.commands;
 
 import debug.Logger;
+import game.GameRenderer;
 import networking.Client;
 import networking.Server;
 
@@ -27,16 +28,29 @@ public class RegisterUserCommand extends Command
             // Check if the username exists
             registrationSuccessful = (server.inGameClients.get(username) == null);
 
-            // If not then add
+            // Reply to client with success or not
+            clientManager.send(this);
+
+            // If successful, add player
             if (registrationSuccessful)
             {
+                // add to dictionary of in-game clients
                 server.inGameClients.put(username,clientManager);
-                Logger.log("New user " + username + " joined the game!");
-            }
+                // Set clientManager username
+                clientManager.username = username;
+                // create player on the map
+                createPlayer(server, username);
 
-            // Reply to client
-            clientManager.send(this);
+                Logger.log("New user \"" + username + "\" joined the game!");
+            }
         }
+    }
+
+    private void createPlayer(Server server, String username)
+    {
+        // TODO only send to close by players
+        MoveCommand moveCommand = new MoveCommand(username, 1, 1);
+        server.sendAll(moveCommand);
     }
 
     @Override
@@ -44,7 +58,11 @@ public class RegisterUserCommand extends Command
     {
         if (registrationSuccessful)
         {
+            // Set username
             client.username = username;
+            // Show the actual game window
+            GameRenderer.current.setVisible(true);
+            // Log
             Logger.log("Joined game with username " + username + "!");
         }
         else

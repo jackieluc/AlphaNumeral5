@@ -6,43 +6,48 @@ import javax.swing.*;
 
 import asciiPanel.AsciiPanel;
 import debug.Logger;
+import game.GameController;
+import game.GameRenderer;
+import game.GameState;
 import networking.Client;
 import networking.Server;
 
-public class ApplicationMain extends JFrame
+import java.awt.*;
+
+public class ApplicationMain
 {
-    private AsciiPanel terminal;
-
-    public ApplicationMain()
-    {
-        super();
-        terminal = new AsciiPanel();
-        add(terminal);
-        pack();
-    }
-
     private static void SetupClient(String ip, String port)
     {
+        Thread thread;
+
+        // Create the renderer and run on thread
+        GameRenderer renderer = new GameRenderer();
+        thread = new Thread(renderer, "Renderer");
+        thread.start();
+
+        // Create client and run on thread
         Client client = new Client(ip,Integer.parseInt(port));
-        Thread thread = new Thread(client);
-        thread.run();
+        thread = new Thread(client, "Client");
+        thread.start();
+
+        // Create the controller and add it to the JFrame
+        GameController controller = new GameController(client);
+        renderer.addController(controller);
     }
 
     private static void SetupServer(String port)
     {
         Server server = new Server(Integer.parseInt(port));
         Thread thread = new Thread(server);
-        thread.run();
+        thread.start();
     }
 
     public static void main(String[] args)
     {
-        //ApplicationMain app = new ApplicationMain();
-        //app.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        //app.setVisible(true);
+        // Create a new game state
+        new GameState();
 
-        //app.terminal.write("rl tutorial", 0, 0);
-
+        // Handle command line arguments
         for (int i = 0; i < args.length; i++)
         {
             if (args[i].equalsIgnoreCase("-c"))

@@ -30,6 +30,11 @@ public class Serializer
         }
     }
 
+    public static byte[] serialize(Object obj)
+    {
+        return null;
+    }
+
     public Object readFromSocket()
     {
         try
@@ -38,8 +43,8 @@ public class Serializer
         }
         catch (Exception ex)
         {
-            //Logger.log("Error reading object from socket!");
-            //ex.printStackTrace();
+            Logger.log("Error reading object from socket!");
+            Logger.log(ex);
         }
 
         return null;

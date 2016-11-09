@@ -1,42 +1,47 @@
 package game;
 
 import debug.Logger;
+import networking.Client;
+import networking.commands.MoveCommand;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 /**
  * Created by Ahmed on 11/7/2016.
  * Controls a game client-side and handles input
  */
-public class GameController
+public class GameController implements KeyListener
 {
-    private boolean quit;
-    private GameRenderer renderer;
+    private Client client;
 
-    public GameController()
+    public GameController(Client client)
+    {
+        this.client = client;
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e)
     {
 
     }
 
-    private void getUsername()
+    @Override
+    public void keyPressed(KeyEvent e)
     {
+        Player player = GameState.current.players.get(client.username);
 
+        switch (e.getKeyCode())
+        {
+            case KeyEvent.VK_RIGHT:
+                client.send(new MoveCommand(client.username, player.x + 1, player.y));
+                break;
+        }
     }
 
-    public void loop()
+    @Override
+    public void keyReleased(KeyEvent e)
     {
-        try
-        {
-            while (!quit)
-            {
-                renderer.draw();
-                //control.check();
-                // wait for a bit
-                Thread.sleep(10);
-            }
-        }
-        catch (Exception ex)
-        {
-            Logger.log("Error in game loop!");
-            Logger.log(ex);
-        }
+
     }
 }
