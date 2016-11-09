@@ -2,7 +2,6 @@ package game;
 
 import asciiPanel.AsciiPanel;
 import debug.Logger;
-import sun.rmi.runtime.Log;
 
 import javax.swing.*;
 import java.awt.event.KeyListener;
