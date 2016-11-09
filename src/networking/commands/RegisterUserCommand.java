@@ -2,9 +2,12 @@ package networking.commands;
 
 import debug.Logger;
 import game.GameRenderer;
+import game.GameState;
+import game.Player;
 import networking.Client;
 import networking.Server;
 
+import java.util.HashMap;
 import java.util.Scanner;
 
 /**
@@ -40,6 +43,8 @@ public class RegisterUserCommand extends Command
                 clientManager.username = username;
                 // create player on the map
                 createPlayer(server, username);
+                //
+                getExistingPlayers(clientManager);
 
                 Logger.log("New user \"" + username + "\" joined the game!");
             }
@@ -51,6 +56,17 @@ public class RegisterUserCommand extends Command
         // TODO only send to close by players
         MoveCommand moveCommand = new MoveCommand(username, 1, 1);
         server.sendAll(moveCommand);
+    }
+
+    private void getExistingPlayers(Server.ClientManager clientManager)
+    {
+        for (HashMap.Entry<String,Player> p : GameState.current.players.entrySet())
+        {
+            if (!p.getKey().equals(username))
+            {
+                clientManager.send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
+            }
+        }
     }
 
     @Override

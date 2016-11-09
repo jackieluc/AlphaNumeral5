@@ -2,6 +2,7 @@ package game;
 
 import asciiPanel.AsciiPanel;
 import debug.Logger;
+import sun.rmi.runtime.Log;
 
 import javax.swing.*;
 import java.awt.event.KeyListener;
@@ -39,6 +40,7 @@ public class GameRenderer extends JFrame implements Runnable
         synchronized (GameState.current)
         {
             needsRedrawing = true;
+            Logger.log("REDRAW PLZ" + needsRedrawing);
         }
     }
 
@@ -70,21 +72,24 @@ public class GameRenderer extends JFrame implements Runnable
         {
             while (isRunning)
             {
+                //Logger.log(needsRedrawing);
                 if (needsRedrawing)
                 {
+                    Logger.log("REDRAW");
                     synchronized (GameState.current)
                     {
                         drawMap();
                         drawPlayers();
                         needsRedrawing = false;
+                        repaint();
+                        terminal.repaint();
                     }
                 }
-
                 // FIX error
                 Thread.sleep(10);
             }
         }
-        catch (InterruptedException ex)
+        catch (Exception ex)
         {
             Logger.log("Error in renderer thread!");
             Logger.log(ex);
@@ -115,7 +120,8 @@ public class GameRenderer extends JFrame implements Runnable
 
         for (Player p : players.values())
         {
-            terminal.write('A', p.x, p.y);
+            terminal.write('B', p.x, p.y);
+            Logger.log(p.x + "" + p.y);
         }
     }
 }
