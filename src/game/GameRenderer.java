@@ -80,6 +80,7 @@ public class GameRenderer extends JFrame implements Runnable
                     }
                 }
 
+                // FIX error
                 Thread.sleep(10);
             }
         }
