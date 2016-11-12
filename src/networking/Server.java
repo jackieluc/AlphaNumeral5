@@ -165,7 +165,7 @@ public class Server implements Runnable
 		{
 			
 			if (isPrimary) {
-				ServerInfo.promote();
+				ServerInfo.addPrimary();
 			}
 			ServerInfo f1= ServerInfo.getInstance();
 			ServerInfo f2= ServerInfo.getInstance();
@@ -173,11 +173,11 @@ public class Server implements Runnable
 			
 			ServerSocket serverSocket = createServerSocket();
 			System.out.println("**************************************");
-			System.out.println("port "+f2.getRunningPort());
-			System.out.println("ip "+ServerInfo.getInstance().getRunningServer());
+			System.out.println("port "+f2.getPort());
+			System.out.println("ip "+ServerInfo.getInstance().getServer());
 			System.out.println("is prim? "+ServerInfo.getInstance().isPrimary());
 			System.out.println("get prim "+ServerInfo.getInstance().getPrimaryServer());
-			System.out.println("all serv "+ServerInfo.getInstance().getServersAsString());
+			System.out.println("all serv "+ServerInfo.getInstance().getAllServers());
 			System.out.println("****************************************");
 			// Create the synchronizer to synchronize between servers
 			FrontEnd synchronizer = new FrontEnd();
@@ -193,8 +193,12 @@ public class Server implements Runnable
 					ClientManager clientManager = new ClientManager(this, serverSocket.accept());
 					if (ServerInfo.getInstance().isPrimary()) {
 						System.out.println("**** IS PRIMARY ***");
-						executorService.submit(clientManager);}
+						executorService.submit(clientManager);
+						}else{
+							System.out.println("no primary server started");
+						}
 				}
+				
 			}
 			
 			
