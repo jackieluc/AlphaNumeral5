@@ -2,7 +2,7 @@ package game;
 
 import asciiPanel.AsciiPanel;
 import debug.Logger;
-import sun.rmi.runtime.Log;
+//import sun.rmi.runtime.Log;
 
 import javax.swing.*;
 import java.awt.event.KeyListener;
@@ -120,7 +120,7 @@ public class GameRenderer extends JFrame implements Runnable
 
         for (Player p : players.values())
         {
-            terminal.write('B', p.x, p.y);
+            terminal.write('>', p.x, p.y);
             Logger.log(p.x + "" + p.y);
         }
     }

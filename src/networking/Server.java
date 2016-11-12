@@ -7,8 +7,10 @@ import networking.commands.RegisterUserCommand;
 import networking.commands.WelcomeCommand;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -18,12 +20,14 @@ import static debug.Logger.log;
 
 public class Server implements Runnable
 {
+	
 	private int port = -1;
     // All clients in game, key is username
 	public HashMap<String,ClientManager> inGameClients;
 	// List of players and their client managers
     public ArrayList<ClientManager> clients;
-
+    public boolean isPrimary = false;
+    
     /**
      * Manages a client (Listens on another thread, sends commands)
      */
@@ -43,6 +47,7 @@ public class Server implements Runnable
 			this.socket = socket;
 			serializer = new Serializer(socket);
 
+			
 			// add to list of clients
             clients.add(this);
 
@@ -69,6 +74,7 @@ public class Server implements Runnable
 		@Override
 		public void run()
 		{
+			
 			Command command;
 
             serializer.writeToSocket(new RegisterUserCommand(null));
@@ -76,7 +82,7 @@ public class Server implements Runnable
 			while ((command = (Command) serializer.readFromSocket()) != null)
 			{
                 //
-                log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
+                log("Command recieved from asd " + socket.getRemoteSocketAddress() + " of type " + command);
 				//
 				if (command != null && command.verify())
 				{
@@ -86,6 +92,7 @@ public class Server implements Runnable
 				}
 			}
 
+			System.out.println("closing");
 			// close everything
 			close();
 		}
@@ -111,8 +118,9 @@ public class Server implements Runnable
         }
 	}
 	
-	public Server(int port)
+	public Server(int port, boolean primary) throws UnknownHostException
 	{
+		isPrimary= primary;
 		this.port = port;
         clients = new ArrayList<>(100);
 		inGameClients = new HashMap<String, ClientManager>();
@@ -152,25 +160,53 @@ public class Server implements Runnable
 	@Override
 	public void run()
 	{
+		
 		try
 		{
+			
+			if (isPrimary) {
+				ServerInfo.promote();
+			}
+			ServerInfo f1= ServerInfo.getInstance();
+			ServerInfo f2= ServerInfo.getInstance();
+			ServerInfo.addServer( InetAddress.getLocalHost().getHostAddress(), port);	
+			
 			ServerSocket serverSocket = createServerSocket();
+			System.out.println("**************************************");
+			System.out.println("port "+f2.getRunningPort());
+			System.out.println("ip "+ServerInfo.getInstance().getRunningServer());
+			System.out.println("is prim? "+ServerInfo.getInstance().isPrimary());
+			System.out.println("get prim "+ServerInfo.getInstance().getPrimaryServer());
+			System.out.println("all serv "+ServerInfo.getInstance().getServersAsString());
+			System.out.println("****************************************");
+			// Create the synchronizer to synchronize between servers
+			FrontEnd synchronizer = new FrontEnd();
+			
 			ExecutorService executorService = Executors.newCachedThreadPool();
-
+			
 			if (serverSocket != null)
 			{
+				synchronizer.sync();
 				while (true)
 				{
 					log("Waiting for connection...");
 					ClientManager clientManager = new ClientManager(this, serverSocket.accept());
-					executorService.submit(clientManager);
+					if (ServerInfo.getInstance().isPrimary()) {
+						System.out.println("**** IS PRIMARY ***");
+						executorService.submit(clientManager);}
 				}
 			}
+			
+			
 		}
+		
+
+		
 		catch (Exception ex)
 		{
 			log("Error in server loop!");
 			log(ex);
 		}
+		
     } // run
 } // networking.Server

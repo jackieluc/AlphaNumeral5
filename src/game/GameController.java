@@ -34,6 +34,8 @@ public class GameController implements KeyListener
         switch (e.getKeyCode())
         {
             case KeyEvent.VK_RIGHT:
+            
+            	
                 client.send(new MoveCommand(client.username, player.x + 1, player.y));
                 break;
         }
