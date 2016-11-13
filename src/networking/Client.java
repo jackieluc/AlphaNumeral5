@@ -2,12 +2,10 @@ package networking;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
-
-import debug.Logger;
 import game.GameRenderer;
 import networking.commands.Command;
 import networking.commands.MoveCommand;
+import networking.commands.RegisterUserCommand;
 
 import static debug.Logger.log;
 
@@ -20,17 +18,17 @@ public class Client implements Runnable
     private Serializer serializer;
     //
     public String username;
+    public boolean registered = false;
 	
 	public Client(String serverIP, int serverPort)
 	{
 		this.serverIP = serverIP;
 		this.serverPort = serverPort;
-        username = null;
 	}
 
 	public boolean isConnected()
     {
-        return (username != null);
+        return socket.isClosed() ? false : socket.isConnected();
     }
 
 	public void stop()
@@ -45,6 +43,35 @@ public class Client implements Runnable
             serializer.writeToSocket(command);
         }
     }
+    
+    public void register() {
+    	// Wait until valid registration response
+    	Command command;
+    	do {
+    		command = (Command)serializer.readFromSocket();
+    		if(command instanceof RegisterUserCommand) {
+    			command.updateClient(this);
+    			if(command.valid()) {
+    				break;
+    			}
+    		}
+    	} while(isConnected());
+    	
+    	// Wait until valid initial move response
+    	do {
+    		command = (Command)serializer.readFromSocket();
+    		if(command instanceof MoveCommand) {
+    			if(command.valid()) {
+    				command.updateState();
+                    command.updateClient(this);
+    				break;
+    			}
+    		}
+    	} while(isConnected());
+    	
+    	// Registration complete
+    	registered = true;
+    }
 
     /**
      * The client listen loop
@@ -53,8 +80,7 @@ public class Client implements Runnable
     public void run()
     {
         // If can't connect, close and quit program
-        if (!connect())
-        {
+        if(!connect()) {
             close();
             return;
         }
@@ -62,13 +88,13 @@ public class Client implements Runnable
         // Create a serializer for this socket
         serializer = new Serializer(socket);
 
+        register();
+        
         // Loop and wait for packets
         Command command;
-        while ((command = (Command) serializer.readFromSocket()) != null)
-        {
+        while ((command = (Command) serializer.readFromSocket()) != null) {
             //
-            if (command != null)
-            {
+            if (command != null) {
                 log("Command recieved of type " + command);
 
                 command.updateState();

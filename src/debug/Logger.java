@@ -11,6 +11,7 @@ package debug;
 
 public class Logger
 {
+	public static String flag = "-d";
 	public static boolean debug = false;
 
     public static void log(Object o)

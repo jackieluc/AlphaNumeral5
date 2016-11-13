@@ -1,13 +1,6 @@
 package game;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.Scanner;
 
 /**
  * Created by Ahmed on 11/7/2016.

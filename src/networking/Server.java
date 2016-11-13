@@ -1,11 +1,8 @@
 package networking;
 
-import debug.Logger;
-import game.Player;
 import networking.commands.Command;
+import networking.commands.QuitCommand;
 import networking.commands.RegisterUserCommand;
-import networking.commands.WelcomeCommand;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -66,25 +63,47 @@ public class Server implements Runnable
 
         }
 
+        public boolean isConnected() {
+            return socket.isClosed() ? false : socket.isConnected();
+        }
+        
+        private void registerUser() {
+        	// Send request for registration
+        	serializer.writeToSocket(new RegisterUserCommand(null));
+        	
+        	// Wait for a valid registration response
+        	Command command;
+        	do {
+        		command = (Command)serializer.readFromSocket();
+        		if(command instanceof RegisterUserCommand) {
+        			command.updateServer(server, this);
+        			if(command.valid()) {
+        				command.updateState();
+        				break;
+        			}
+        		}
+        	} while(isConnected());
+        }
+        
+        private void receiveCommands() {
+        	Command command;
+        	do {
+        		command = (Command)serializer.readFromSocket();
+        		if(command.valid()) {
+        			command.updateState();
+        			command.updateServer(server, this);
+        		}
+        		if(command instanceof QuitCommand) {
+        			break;
+        		}
+        	} while(isConnected());
+        }
+        
 		@Override
 		public void run()
 		{
-			Command command;
-
-            serializer.writeToSocket(new RegisterUserCommand(null));
-
-			while ((command = (Command) serializer.readFromSocket()) != null)
-			{
-                //
-                log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
-				//
-				if (command != null && command.verify())
-				{
-					Logger.log("Is valid command");
-					command.updateState();
-					command.updateServer(server,this);
-				}
-			}
+			registerUser();
+			receiveCommands();
 
 			// close everything
 			close();
@@ -116,6 +135,10 @@ public class Server implements Runnable
 		this.port = port;
         clients = new ArrayList<>(100);
 		inGameClients = new HashMap<String, ClientManager>();
+	}
+	
+	public boolean registered(String username) {
+		return (inGameClients.get(username) != null);
 	}
 
     /**

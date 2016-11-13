@@ -6,6 +6,7 @@ import game.GameState;
 import game.Player;
 import networking.Client;
 import networking.Server;
+import networking.Server.ClientManager;
 
 /**
  * Created by Ahmed on 11/7/2016.
@@ -23,13 +24,12 @@ public class MoveCommand extends Command
     }
 
     @Override
-    public boolean verify()
-    {
-        return super.verify();
+    public boolean valid() {
+        return GameState.current.map.validMove(x, y);
     }
 
     @Override
-    public void updateServer(Server server, Server.ClientManager clientManager)
+    public void updateServer(Server server, ClientManager clientManager)
     {
         Logger.log("VALID MOVE COMMAND");
 
@@ -38,14 +38,11 @@ public class MoveCommand extends Command
     }
 
     @Override
-    public void updateState()
-    {
-        synchronized (GameState.current)
-        {
+    public void updateState() {
+        synchronized(GameState.current) {
             Player player = GameState.current.players.get(username);
-
-            if (player == null)
-            {
+            System.out.println(username);
+            if(player == null) {
                 player = new Player(username);
                 GameState.current.players.put(username, player);
                 Logger.log("NEW");
@@ -58,8 +55,7 @@ public class MoveCommand extends Command
     }
 
     @Override
-    public void updateClient(Client client)
-    {
+    public void updateClient(Client client) {
         GameRenderer.current.redraw();
     }
 }

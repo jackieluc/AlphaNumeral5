@@ -28,6 +28,15 @@ public class Map
         return height;
     }
 
+    public boolean validMove(int x, int y) {
+    	if(x > 0 && x < width-1) {
+    		if(y > 0 && y < height-1) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
     public char getTile(int x, int y)
     {
         return tiles[y][x];
@@ -59,6 +68,8 @@ public class Map
                     tiles[y][x] = line.charAt(x);
                 }
             }
+            
+            sc.close();
         }
         catch (IOException ex)
         {
