@@ -1,8 +1,6 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Random;
 
@@ -37,18 +35,23 @@ public class RequestHandler implements Runnable {
 			// we first accept the initial request of the client's name
 			incoming = incomingData.readUTF();
 			if(incoming.startsWith("hello ")) {
-				outgoingData.writeUTF("Hello " + incoming.substring(6));
+				outgoingData.writeUTF("Hello " + incoming.substring(6) + " you can start sending me stuff!");
 			}
 			
 			String clientName = incoming.substring(6);
 			
-			while(!incoming.equals("quit")) {
+			while(true) {
 				incoming = incomingData.readUTF();
 				
-				Logger.log("Data from " + clientName + " : " + incoming);
+				if(incoming.equals("quit"))
+					break;
 				
-				if(!incoming.equals("quit"))
-					outgoingData.writeUTF("To " + clientName + ", here's a random number: " + randomNumber.nextInt(1000));
+				Logger.log("Request from " + clientName + ": " + incoming);
+				
+				int randomNum = randomNumber.nextInt(1000);
+				
+				outgoingData.writeUTF("Response to " + clientName + ", here's a random number: " + randomNum);
+				Logger.log("Response to " + clientName + ", here's a random number: " + randomNum);
 			}
 			
 			System.out.println("Client: " + clientName + " decided to quit.");

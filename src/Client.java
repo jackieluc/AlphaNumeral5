@@ -2,12 +2,14 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Client {
 	
 	private String serverIP;
 	private int serverPort;
+	private Random rand = new Random();
 	
 	public Client(String s, int p) {
 		this.serverIP = s;
@@ -36,19 +38,22 @@ public class Client {
 			System.out.println(incomingData.readUTF());
 
 			// client send requests and see responses from server until client wants to quit
-			boolean quit = false;
-			while(!quit) {
+			while(true) {
 				
 				outgoing = ui.nextLine();
+
 				outgoingData.writeUTF(outgoing);
 				if(outgoing.equals("quit")) {
-					quit = true;
 					Logger.log("You decided to quit.");
+					break;
 				}
 				
 				Logger.log("Request: " + outgoing);
-				if(!quit)
-					Logger.log("Response: " + incomingData.readUTF());
+				
+				int waitTime = (rand.nextInt(10 + 1)*1000);
+				Logger.log("Waiting for " + waitTime/1000 + " seconds...");
+				
+				Logger.log("Response: " + incomingData.readUTF());
 			}
 			Logger.log("Cleaning up...");
 			ui.close();
