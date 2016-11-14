@@ -28,7 +28,9 @@ public class GameController implements KeyListener
     @Override
     public void keyPressed(KeyEvent e)
     {
+    	// System.out.println(">>username "+Player player= GameStat.);
         Player player = GameState.current.players.get(client.username);
+       
 
         switch (e.getKeyCode())
         {

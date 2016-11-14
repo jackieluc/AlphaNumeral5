@@ -2,6 +2,7 @@ package networking;
 
 import debug.Logger;
 import game.Player;
+import networking.commands.BackupCommand;
 import networking.commands.Command;
 import networking.commands.RegisterUserCommand;
 import networking.commands.WelcomeCommand;
@@ -26,6 +27,7 @@ public class Server implements Runnable
 	public HashMap<String,ClientManager> inGameClients;
 	// List of players and their client managers
     public ArrayList<ClientManager> clients;
+    public Hashtable servers= new Hashtable();
     public boolean isPrimary = false;
     
     /**
@@ -76,16 +78,24 @@ public class Server implements Runnable
 		{
 			
 			Command command;
+		
 
             serializer.writeToSocket(new RegisterUserCommand(null));
 
 			while ((command = (Command) serializer.readFromSocket()) != null)
 			{
-                //
-                log("Command recieved from asd " + socket.getRemoteSocketAddress() + " of type " + command);
+                
+                log("Command recieved from  " + socket.getRemoteSocketAddress() + " of type " + command.getClass().getSimpleName());
+              //Doesnt go inside this if statement trying to check if the command was a backupcommand
+                System.out.println(command.getClass().getName());
+               if(command !=null && command.getClass().getSimpleName() == "BackupCommand")
+               {
+            	 servers.put(command.getIp(), command.getPort());
+               }
 				//
-				if (command != null && command.verify())
+                else if (command != null && command.verify())
 				{
+                	
 					Logger.log("Is valid command");
 					command.updateState();
 					command.updateServer(server,this);

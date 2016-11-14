@@ -36,4 +36,9 @@ public abstract class Command implements Serializable
      * ONLY CALLED ON SERVER
      */
     public void updateServer(Server server, Server.ClientManager clientManager){}
+    
+    public String getIp(){
+		return null;}
+    public int getPort(){
+		return 0;}
 }

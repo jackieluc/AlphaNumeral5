@@ -9,6 +9,7 @@ import debug.Logger;
 import game.GameController;
 import game.GameRenderer;
 import game.GameState;
+import networking.BackupServer;
 import networking.Client;
 import networking.ServerInfo;
 import networking.Server;
@@ -35,12 +36,11 @@ public class ApplicationMain
 
        
         // Create client and run on thread
-        for(int i=0; i<servers.length; i++)
-        {
-         client = new Client(servers[i],port[i]);
+     
+         client = new Client(servers[0],port[0]);
         thread = new Thread(client, "Client");
         thread.start();
-        }
+      
    
 
         // Create the controller and add it to the JFrame
@@ -58,6 +58,12 @@ public class ApplicationMain
         
         
     }
+    
+    private static void setupBackup(String port) {
+		BackupServer backupServer = new BackupServer(Integer.parseInt(port));
+        Thread thread = new Thread(backupServer);
+        thread.start();		
+	}
 
     public static void main(String[] args) throws NumberFormatException, UnknownHostException
     {
@@ -75,6 +81,10 @@ public class ApplicationMain
         for (int i = 0; i < args.length; i++)
         {
         	
+            if (args[i].equalsIgnoreCase("-b"))
+            {
+            	 setupBackup(args[++i]);
+            }
             if (args[i].equalsIgnoreCase("-c"))
             {
                 SetupClient();
@@ -97,4 +107,6 @@ public class ApplicationMain
     	
        
     }
+
+	
 }
