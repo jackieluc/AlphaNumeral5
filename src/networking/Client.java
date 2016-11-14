@@ -89,7 +89,7 @@ public class Client implements Runnable
      */
     private boolean connect()
     {
-        try
+        /*try
         {
             socket = new Socket(serverIP, serverPort);
             return true;
@@ -99,7 +99,11 @@ public class Client implements Runnable
             log("Error connecting to server");
             log(ex);
             return false;
-        }
+        }*/
+        ServerList serverList = new ServerList();
+        socket = serverList.getConnectionToMasterServer();
+
+        return (socket != null);
     }
 
     /**

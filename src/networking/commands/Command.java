@@ -3,7 +3,6 @@ package networking.commands;
 import networking.Client;
 import networking.Server;
 
-import java.io.InputStream;
 import java.io.Serializable;
 
 /**
@@ -35,5 +34,5 @@ public abstract class Command implements Serializable
      * Updates the server
      * ONLY CALLED ON SERVER
      */
-    public void updateServer(Server server, Server.ClientManager clientManager){}
+    public void updateServer(Server server, Server.ClientConnection clientConnection){}
 }

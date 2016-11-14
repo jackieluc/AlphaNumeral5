@@ -29,7 +29,7 @@ public class MoveCommand extends Command
     }
 
     @Override
-    public void updateServer(Server server, Server.ClientManager clientManager)
+    public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
         Logger.log("VALID MOVE COMMAND");
 
@@ -48,7 +48,7 @@ public class MoveCommand extends Command
             {
                 player = new Player(username);
                 GameState.current.players.put(username, player);
-                Logger.log("NEW");
+                Logger.log("Created new player " + username);
             }
 
             Logger.log(x +" " + y);

@@ -36,6 +36,15 @@ public class GameController implements KeyListener
             case KeyEvent.VK_RIGHT:
                 client.send(new MoveCommand(client.username, player.x + 1, player.y));
                 break;
+            case KeyEvent.VK_LEFT:
+                client.send(new MoveCommand(client.username, player.x -1, player.y));
+                break;
+            case KeyEvent.VK_UP:
+                client.send(new MoveCommand(client.username, player.x , player.y-1));
+                break;
+            case KeyEvent.VK_DOWN:
+                client.send(new MoveCommand(client.username, player.x, player.y+1));
+                break;
         }
     }
 

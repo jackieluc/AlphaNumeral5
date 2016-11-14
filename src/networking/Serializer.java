@@ -1,7 +1,9 @@
 package networking;
 
 import debug.Logger;
+import networking.commands.WelcomeCommand;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -14,6 +16,27 @@ public class Serializer
 {
     private ObjectInputStream in;
     private ObjectOutputStream out;
+
+    //
+    private static ByteArrayOutputStream bout;
+    private static ObjectOutputStream oout;
+
+    static
+    {
+        try
+        {
+            bout = new ByteArrayOutputStream();
+            oout = new ObjectOutputStream(bout);
+
+            oout.writeObject(new WelcomeCommand());
+            oout.flush();
+            bout.toByteArray();
+        }
+        catch (IOException ex)
+        {
+            Logger.log("Error creating static serializer!");
+        }
+    }
 
     public Serializer(Socket socket)
     {
@@ -30,8 +53,24 @@ public class Serializer
         }
     }
 
+    /**
+     * Serializes an object to a byte array
+     * @param obj
+     * @return
+     */
     public static byte[] serialize(Object obj)
     {
+        try
+        {
+            oout.writeObject(obj);
+            oout.flush();
+            return bout.toByteArray();
+        }
+        catch (IOException ex)
+        {
+            Logger.log("Error serializing with static serializer");
+        }
+
         return null;
     }
 

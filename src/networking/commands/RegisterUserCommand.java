@@ -24,7 +24,7 @@ public class RegisterUserCommand extends Command
     }
 
     @Override
-    public void updateServer(Server server, Server.ClientManager clientManager)
+    public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
         synchronized (server.inGameClients)
         {
@@ -32,19 +32,19 @@ public class RegisterUserCommand extends Command
             registrationSuccessful = (server.inGameClients.get(username) == null);
 
             // Reply to client with success or not
-            clientManager.send(this);
+            clientConnection.send(this);
 
             // If successful, add player
             if (registrationSuccessful)
             {
                 // add to dictionary of in-game clients
-                server.inGameClients.put(username,clientManager);
-                // Set clientManager username
-                clientManager.username = username;
+                server.inGameClients.put(username, clientConnection);
+                // Set clientConnection username
+                clientConnection.username = username;
                 // create player on the map
                 createPlayer(server, username);
                 //
-                getExistingPlayers(clientManager);
+                getExistingPlayers(clientConnection);
 
                 Logger.log("New user \"" + username + "\" joined the game!");
             }
@@ -58,13 +58,13 @@ public class RegisterUserCommand extends Command
         server.sendAll(moveCommand);
     }
 
-    private void getExistingPlayers(Server.ClientManager clientManager)
+    private void getExistingPlayers(Server.ClientConnection clientConnection)
     {
         for (HashMap.Entry<String,Player> p : GameState.current.players.entrySet())
         {
             if (!p.getKey().equals(username))
             {
-                clientManager.send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
+                clientConnection.send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
             }
         }
     }

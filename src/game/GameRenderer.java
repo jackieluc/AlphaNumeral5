@@ -120,7 +120,7 @@ public class GameRenderer extends JFrame implements Runnable
         for (Player p : players.values())
         {
             terminal.write('B', p.x, p.y);
-            Logger.log(p.x + "" + p.y);
+            Logger.log(p.username + " @ (" + p.x + "," + p.y + ")");
         }
     }
 }
