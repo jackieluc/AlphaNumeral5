@@ -20,19 +20,28 @@ import java.net.UnknownHostException;
 public class ApplicationMain
 {
 	static boolean primary= false;
-    private static void SetupClient(String ip, String port)
+    private static void SetupClient()
     {
+
+    	String[] servers= {"127.0.0.1","127.0.0.1"};
+    	int[] port= {5555,5556};
         Thread thread;
+        Client client = null;
 
         // Create the renderer and run on thread
         GameRenderer renderer = new GameRenderer();
         thread = new Thread(renderer, "RendererS");
         thread.start();
 
+       
         // Create client and run on thread
-        Client client = new Client(ip,Integer.parseInt(port));
+        for(int i=0; i<servers.length; i++)
+        {
+         client = new Client(servers[i],port[i]);
         thread = new Thread(client, "Client");
         thread.start();
+        }
+   
 
         // Create the controller and add it to the JFrame
         GameController controller = new GameController(client);
@@ -68,7 +77,7 @@ public class ApplicationMain
         	
             if (args[i].equalsIgnoreCase("-c"))
             {
-                SetupClient(args[++i],args[++i]);
+                SetupClient();
             }
             else if (args[i].equalsIgnoreCase("-p"))
             {

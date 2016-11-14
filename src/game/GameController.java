@@ -3,7 +3,6 @@ package game;
 import debug.Logger;
 import networking.Client;
 import networking.commands.MoveCommand;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -34,9 +33,20 @@ public class GameController implements KeyListener
         switch (e.getKeyCode())
         {
             case KeyEvent.VK_RIGHT:
-            
-            	
-                client.send(new MoveCommand(client.username, player.x + 1, player.y));
+            	if (CheckValid.checkx(player.x))
+            		client.send(new MoveCommand(client.username, player.x + 1, player.y));
+                break;
+                
+            case KeyEvent.VK_LEFT:
+            	 client.send(new MoveCommand(client.username, player.x - 1, player.y));
+                 break;
+                 
+            case KeyEvent.VK_UP:
+           	 client.send(new MoveCommand(client.username, player.x, player.y+1));
+                break;
+                
+            case KeyEvent.VK_DOWN:
+           	 client.send(new MoveCommand(client.username, player.x - 1, player.y-1));
                 break;
         }
     }

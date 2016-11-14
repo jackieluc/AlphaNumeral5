@@ -110,7 +110,7 @@ public class ServerInfo {
 	}
 
 	//return the port address of the running server
-	public int getPort() {
+	public static int getPort() {
 		return runningPort;
 	}
 

@@ -167,20 +167,20 @@ public class Server implements Runnable
 			if (isPrimary) {
 				ServerInfo.addPrimary();
 			}
-			ServerInfo f1= ServerInfo.getInstance();
-			ServerInfo f2= ServerInfo.getInstance();
+			
 			ServerInfo.addServer( InetAddress.getLocalHost().getHostAddress(), port);	
 			
 			ServerSocket serverSocket = createServerSocket();
 			System.out.println("**************************************");
-			System.out.println("port "+f2.getPort());
+			System.out.println("port "+ServerInfo.getPort());
 			System.out.println("ip "+ServerInfo.getInstance().getServer());
 			System.out.println("is prim? "+ServerInfo.getInstance().isPrimary());
 			System.out.println("get prim "+ServerInfo.getInstance().getPrimaryServer());
 			System.out.println("all serv "+ServerInfo.getInstance().getAllServers());
 			System.out.println("****************************************");
 			// Create the synchronizer to synchronize between servers
-			FrontEnd synchronizer = new FrontEnd();
+			//doesnt do anyhting so far
+			Synchronize synchronizer = new Synchronize();
 			
 			ExecutorService executorService = Executors.newCachedThreadPool();
 			
