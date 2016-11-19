@@ -246,7 +246,8 @@ public class Server implements Runnable
 
         if (socket != null)
         {
-        	log(" **** primary found at "+ socket + "starting server as a backup ****");
+        	log(" **** primary found at "+ socket + "****"
+        			+ "****starting server as a backup ****");
         //	System.err.println("line 143 BS socker "+socket.getPort());
             MasterServerConnection connection = new MasterServerConnection(socket);
             Thread thread = new Thread(connection);

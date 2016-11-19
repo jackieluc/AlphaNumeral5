@@ -98,10 +98,10 @@ public class Client implements Runnable
             log(ex);
             return false;
         }*/
-    	System.err.println("client 101 serverPort "+ serverPort);
+    	//System.err.println("client 101 serverPort "+ serverPort);
         ServerList serverList = new ServerList(serverPort);
         socket = serverList.getConnectionToMasterServer();
-        System.err.println("returned socket in client line 103 "+socket);
+       // System.err.println("returned socket in client line 103 "+socket);
         return (socket != null);
     }
 

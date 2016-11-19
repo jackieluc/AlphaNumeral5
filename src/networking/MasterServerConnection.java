@@ -42,10 +42,12 @@ import static debug.Logger.log;
                 //
                 command.updateState();
             }
+            System.err.println("server crahsed");
 
             // close everything
             try
             {
+            	System.err.println("closing");
                 isRunning = false;
                 close();
             }
