@@ -3,8 +3,10 @@ package networking;
 import debug.Logger;
 import game.GameState;
 import game.Player;
+//import networking.BackupServer.MasterServerConnection;
 import networking.commands.Command;
 import networking.commands.MoveCommand;
+import networking.commands.RegisterBackupServerCommand;
 import networking.commands.RegisterUserCommand;
 
 import java.io.IOException;
@@ -20,6 +22,7 @@ import static debug.Logger.log;
 
 public class Server implements Runnable
 {
+	 private static boolean isRunning;
 	private int port = -1;
     //
     private ServerSocket serverSocket;
@@ -227,25 +230,56 @@ public class Server implements Runnable
 	@Override
 	public void run()
 	{
-		try
-		{
-			serverSocket = createServerSocket();
-			executorService = Executors.newCachedThreadPool();
+		connectToMaster();
+		
+    } // run
+	
+	 /**
+     * Connect to the master server
+     */
+    void connectToMaster()
+    {
+    	
+        ServerList serverList = new ServerList(port);
+       // System.err.println("returning from server list");
+        Socket socket = serverList.getConnectionToMasterServer();
 
-			if (serverSocket != null)
+        if (socket != null)
+        {
+        	log(" **** primary found at "+ socket + "starting server as a backup ****");
+        //	System.err.println("line 143 BS socker "+socket.getPort());
+            MasterServerConnection connection = new MasterServerConnection(socket);
+            Thread thread = new Thread(connection);
+            thread.start();
+        }
+        
+        
+        
+ 
+       ///////////////
+        else{
+        	log("**** no primary found, starting server as primary ****");
+        	executorService = Executors.newCachedThreadPool();
+        	serverSocket = createServerSocket();
+        	if (serverSocket != null)
 			{
+				
 				while (true)
 				{
 					log("Waiting for connection...");
+					try{
 					ClientConnection clientConnection = new ClientConnection(this, serverSocket.accept());
 					executorService.submit(clientConnection);
+					}catch (Exception ex)
+					{
+						log("Error in server loop!");
+						log(ex);
+					}
 				}
 			}
-		}
-		catch (Exception ex)
-		{
-			log("Error in server loop!");
-			log(ex);
-		}
-    } // run
+
+        }
+    }
+    
+    
 } // networking.Server

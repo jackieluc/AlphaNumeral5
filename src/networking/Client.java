@@ -21,10 +21,8 @@ public class Client implements Runnable
     //
     public String username;
 	
-	public Client(String serverIP, int serverPort)
+	public Client()
 	{
-		this.serverIP = serverIP;
-		this.serverPort = serverPort;
         username = null;
 	}
 
@@ -100,9 +98,10 @@ public class Client implements Runnable
             log(ex);
             return false;
         }*/
-        ServerList serverList = new ServerList();
+    	System.err.println("client 101 serverPort "+ serverPort);
+        ServerList serverList = new ServerList(serverPort);
         socket = serverList.getConnectionToMasterServer();
-
+        System.err.println("returned socket in client line 103 "+socket);
         return (socket != null);
     }
 

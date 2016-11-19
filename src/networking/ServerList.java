@@ -1,7 +1,6 @@
 package networking;
 
 import debug.Logger;
-import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.net.*;
@@ -14,17 +13,20 @@ import java.util.Scanner;
 public class ServerList
 {
     private ArrayList<InetSocketAddress> serverAddresses;
+    int port;
 
-    public ServerList()
+    public ServerList(int port)
     {
         serverAddresses = new ArrayList<>();
         load();
+        this.port=port;
     }
 
     private void load()
     {
         try
         {
+        	//System.out.println(">>>>>trying to open serverFile ");
             Scanner sc = new Scanner(getClass().getClassLoader().getResource("serverlist.txt").openStream());
 
             String line;
@@ -32,7 +34,7 @@ public class ServerList
             {
                 line = sc.next();
 
-                System.out.println(line);
+               // System.out.println(">>>>>ServerList "+ line);
                 String ip[] = line.split(":");
                 serverAddresses.add(new InetSocketAddress(ip[0], Integer.parseInt(ip[1])));
             }
@@ -48,18 +50,20 @@ public class ServerList
     {
         Socket socket;
 
+        
         for (InetSocketAddress address : serverAddresses)
         {
-            Logger.log("Trying to connect to " + address);
+        	//System.err.println("inside master ");
+           // Logger.log("Trying to connect to " + address);
 
-            if ((socket = connect(address)) != null)
+            if ((socket = connect(address)) != null && address.getPort() != port)
             {
                 Logger.log("Connected to " + address);
 
                 // If is master server, return socket
                 if (isMasterServer(socket))
                 {
-                    Logger.log(address + " is master server");
+                  //  Logger.log(address + " is master server");
                     return socket;
                 }
 
@@ -92,7 +96,7 @@ public class ServerList
         try
         {
             int serverStatus = socket.getInputStream().read();
-            Logger.log("got " + serverStatus);
+           // Logger.log("got " + serverStatus);
             return (serverStatus == 1);
         }
         catch (IOException ex)
