@@ -55,6 +55,7 @@ public class Client implements Runnable
         // If can't connect, close and quit program
         if (!connect())
         {
+            Logger.log("Cannot connect to server... Please try again later.");
             close();
             return;
         }
@@ -66,14 +67,10 @@ public class Client implements Runnable
         Command command;
         while ((command = (Command) serializer.readFromSocket()) != null)
         {
-            //
-            if (command != null)
-            {
-                log("Command recieved of type " + command);
+            log("Command recieved of type " + command);
 
-                command.updateState();
-                command.updateClient(this);
-            }
+            command.updateState();
+            command.updateClient(this);
         }
 
         // TODO try to reconnect

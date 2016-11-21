@@ -32,6 +32,16 @@ public class Server implements Runnable
     //
     public ArrayList<BackupServerConnection> backupServers;
 
+	public Server(int port)
+	{
+		this.port = port;
+
+		clients = new ArrayList<>(100);
+		backupServers = new ArrayList<>(10);
+
+		inGameClients = new HashMap<String, ClientConnection>();
+	}
+
     /**
      * Manages a client (Listens on another thread, sends commands)
      */
@@ -74,7 +84,7 @@ public class Server implements Runnable
 				//
 				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
 				//
-				if (command != null && command.verify())
+				if (command.verify())
 				{
 					Logger.log("Is valid command");
 					command.updateState();
@@ -157,16 +167,6 @@ public class Server implements Runnable
             }
         }
 	}
-	
-	public Server(int port)
-	{
-		this.port = port;
-
-        clients = new ArrayList<>(100);
-        backupServers = new ArrayList<>(10);
-
-		inGameClients = new HashMap<String, ClientConnection>();
-	}
 
     /**
      * Sends a command to all clients
@@ -207,7 +207,6 @@ public class Server implements Runnable
 
     /**
      * Creates a server socket
-     * @return
      */
 	private ServerSocket createServerSocket()
 	{
