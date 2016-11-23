@@ -1,5 +1,7 @@
 package networking.commands;
 
+import FileIO.ReadFile;
+import FileIO.WriteFile;
 import debug.Logger;
 import game.GameRenderer;
 import game.GameState;
@@ -40,9 +42,13 @@ public class MoveCommand extends Command
             Logger.log("username: " + username + " @ " + x + ", " + y);
 
             Logger.log("Updating position on hard-disk...");
-            server.writeToDisk(username);
+            new WriteFile(username).writeToDisk();
             server.backup(this);
             server.sendAll(this);
+
+            Logger.log("Testing read:");
+            int[] pos = new ReadFile(username).readFromDisk();
+            Logger.log(username + " is @ " + pos[0] + " " + pos[1]);
         }
     }
 
