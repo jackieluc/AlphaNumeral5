@@ -66,4 +66,26 @@ public class Map
             Logger.log(ex);
         }
     }
+
+    public boolean insideMap(int x, int y)
+    {
+        if (x > 0 && x < width-1)
+        {
+            if (y > 0 && y < height-1)
+                return true;
+        }
+
+        return false;
+    }
+
+    public boolean validMove(int x, int y)
+    {
+        if(!insideMap(x, y))
+            return false;
+
+        if(tiles[y][x] != ' ')
+            return false;
+
+        return true;
+    }
 }

@@ -48,6 +48,7 @@ public class RegisterUserCommand extends Command
 
                 Logger.log("New user \"" + username + "\" joined the game!");
             }
+            server.backup(this);
         }
     }
 

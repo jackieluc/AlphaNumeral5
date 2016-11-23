@@ -25,7 +25,8 @@ public class MoveCommand extends Command
     @Override
     public boolean verify()
     {
-        return super.verify();
+        return GameState.current.map.validMove(x, y);
+//        return GameState.current.map.insideMap(x, y);
     }
 
     @Override
@@ -34,7 +35,13 @@ public class MoveCommand extends Command
         Logger.log("VALID MOVE COMMAND");
 
         // TODO only send to close by players
-        server.sendAll(this);
+        if (verify())
+        {
+            Logger.log("username: " + username + " @ " + x + ", " + y);
+
+            server.backup(this);
+            server.sendAll(this);
+        }
     }
 
     @Override
