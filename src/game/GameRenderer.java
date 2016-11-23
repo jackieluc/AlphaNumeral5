@@ -36,7 +36,7 @@ public class GameRenderer extends JFrame implements Runnable
 
     public void redraw()
     {
-        synchronized (GameState.current)
+        synchronized (GameState.getInstance())
         {
             needsRedrawing = true;
             Logger.log("REDRAW PLZ" + needsRedrawing);
@@ -75,7 +75,7 @@ public class GameRenderer extends JFrame implements Runnable
                 if (needsRedrawing)
                 {
                     Logger.log("REDRAW");
-                    synchronized (GameState.current)
+                    synchronized (GameState.getInstance())
                     {
                         drawMap();
                         drawPlayers();
@@ -102,7 +102,7 @@ public class GameRenderer extends JFrame implements Runnable
 
     private void drawMap()
     {
-        Map map = GameState.current.map;
+        Map map = GameState.getInstance().getMap();
 
         for (int x = 0; x < map.getWidth(); x++)
         {
@@ -115,7 +115,7 @@ public class GameRenderer extends JFrame implements Runnable
 
     private void drawPlayers()
     {
-        HashMap<String,Player> players = GameState.current.players;
+        HashMap<String,Player> players = GameState.getInstance().getPlayers();
 
         for (Player p : players.values())
         {

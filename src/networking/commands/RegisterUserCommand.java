@@ -48,7 +48,6 @@ public class RegisterUserCommand extends Command
 
                 Logger.log("New user \"" + username + "\" joined the game!");
             }
-            server.backup(this);
         }
     }
 
@@ -61,7 +60,7 @@ public class RegisterUserCommand extends Command
 
     private void getExistingPlayers(Server.ClientConnection clientConnection)
     {
-        for (HashMap.Entry<String,Player> p : GameState.current.players.entrySet())
+        for (HashMap.Entry<String,Player> p : GameState.getInstance().getPlayers().entrySet())
         {
             if (!p.getKey().equals(username))
             {

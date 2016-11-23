@@ -9,25 +9,36 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Scanner;
 
-/**
- * Created by Ahmed on 11/7/2016.
- */
 public class GameState
 {
-    public static GameState current;
+    private static final GameState INSTANCE = new GameState();
     // The players on the map
-    public HashMap<String,Player> players;
+    private HashMap<String,Player> players;
     // The map
-    public final Map map;
+    private final Map map;
 
     public GameState()
     {
-        // Set current game state
-        current = this;
         // Initialize vars
-        players = new HashMap<>();
+        players = new HashMap<String, Player>();
         // Load map
         map = new Map();
 
+    }
+
+    //singleton
+    public static GameState getInstance()
+    {
+        return INSTANCE;
+    }
+
+    public HashMap<String,Player> getPlayers()
+    {
+        return players;
+    }
+
+    public Map getMap()
+    {
+        return map;
     }
 }

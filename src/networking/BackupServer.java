@@ -1,6 +1,7 @@
 package networking;
 
 import debug.Logger;
+import game.GameState;
 import networking.commands.Command;
 import networking.commands.RegisterBackupServerCommand;
 

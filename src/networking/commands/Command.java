@@ -20,7 +20,7 @@ public abstract class Command implements Serializable
     }
 
     /**
-     * Updates the game state (both client and server
+     * Updates the game state (both client and server)
      */
     public void updateState(){}
 

@@ -7,8 +7,7 @@ import networking.commands.Command;
 import networking.commands.MoveCommand;
 import networking.commands.RegisterUserCommand;
 
-import java.io.IOException;
-import java.io.Serializable;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
@@ -61,33 +60,32 @@ public class Server implements Runnable
 		}
 
 		@Override
-		public void run()
-		{
+		public void run() {
 			Command command;
 
 			// Tell the user to register (no commands will be accepted until successful registration)
 			serializer.writeToSocket(new RegisterUserCommand(null));
 
 			// Wait for commands from client
-			while ((command = (Command) serializer.readFromSocket()) != null)
-			{
+			while ((command = (Command) serializer.readFromSocket()) != null) {
 				//
-				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
+				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command.getClass().toString());
 				//
-				if (command != null && command.verify())
-				{
-					Logger.log("Is valid command");
+				if (command.verify()) {
+					Logger.log("Updating position on hard-disk...");
+					server.writeToDisk(username);
+					// Send to backup servers
+					log("Sending command to backups...");
+					backup(command);
+					log("Updating state and server...");
 					command.updateState();
 					command.updateServer(server, this);
-
-                    // Send to backup servers
-                    backup(command);
 				}
 			}
 
 			// close everything
-            if (!isTransferred)
-			    close();
+			if (!isTransferred)
+				close();
 		}
 
 		/**
@@ -151,9 +149,10 @@ public class Server implements Runnable
          */
         private void updateState()
         {
-            for (HashMap.Entry<String, Player> p : GameState.current.players.entrySet())
+            for (HashMap.Entry<String, Player> p : GameState.getInstance().getPlayers().entrySet())
             {
                 send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
+				log("username: " + p.getKey() + " x: " + p.getValue().x + " y:" + p.getValue().y);
             }
         }
 	}
@@ -189,6 +188,73 @@ public class Server implements Runnable
         }
         //sendSerialized(backupServers, Serializer.serialize(command));
     }
+
+	/**
+	 * create a directory called PlayerData if it doesn't exist
+	 * create a file for the player if it doesn't exist
+	 * update the player's file by storing x and y position
+	 * @param username
+	 */
+	public void writeToDisk(String username)
+	{
+		String directoryPath = "./PlayerData/";
+		String filename = username + ".txt";
+		File playerFile = new File(directoryPath + filename);
+		File directory = new File(directoryPath);
+
+		//create the "PLayerData" directory if it doesn't exist
+		if(!directory.exists())
+			directory.mkdir();
+
+		//create the player's file if it doesn't exist
+		if(!playerFile.exists())
+		{
+			try {
+				playerFile.createNewFile();
+			} catch (IOException e) {
+				//TODO: handle exception
+				e.printStackTrace();
+			}
+		}
+
+		try {
+			FileWriter fw = new FileWriter(playerFile.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+
+			//get the player's position to write to disk
+			synchronized (GameState.getInstance()) {
+				Player player = GameState.getInstance().getPlayers().get(username);
+				bw.write(player.x + " " + player.y);
+			}
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * retrieve the position stored in the player's file
+	 * @param username
+	 * @return array of strings, where [0] is x position and [1] is y position
+	 */
+	public String[] readFromDisk(String username)
+	{
+		FileReader fr;
+		String[] positions = null;
+		String directoryPath = "./PlayerData/";
+		try {
+			File playerFile = new File(directoryPath + username + ".txt");
+			fr = new FileReader(playerFile.getAbsolutePath());
+			BufferedReader br = new BufferedReader(fr);
+
+			positions = br.readLine().split(" ");
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return positions;
+	}
 
     private void sendSerialized(ArrayList<? extends Connection> list, byte[] bytes)
     {

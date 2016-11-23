@@ -25,7 +25,7 @@ public class MoveCommand extends Command
     @Override
     public boolean verify()
     {
-        return GameState.current.map.validMove(x, y);
+        return GameState.getInstance().getMap().validMove(x, y);
 //        return GameState.current.map.insideMap(x, y);
     }
 
@@ -39,7 +39,7 @@ public class MoveCommand extends Command
         {
             Logger.log("username: " + username + " @ " + x + ", " + y);
 
-            server.backup(this);
+//            server.backup(this);
             server.sendAll(this);
         }
     }
@@ -47,14 +47,14 @@ public class MoveCommand extends Command
     @Override
     public void updateState()
     {
-        synchronized (GameState.current)
+        synchronized (GameState.getInstance())
         {
-            Player player = GameState.current.players.get(username);
+            Player player = GameState.getInstance().getPlayers().get(username);
 
             if (player == null)
             {
                 player = new Player(username);
-                GameState.current.players.put(username, player);
+                GameState.getInstance().getPlayers().put(username, player);
                 Logger.log("Created new player " + username);
             }
 
