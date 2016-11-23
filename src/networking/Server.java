@@ -72,12 +72,8 @@ public class Server implements Runnable
 				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command.getClass().toString());
 				//
 				if (command.verify()) {
-					Logger.log("Updating position on hard-disk...");
-					server.writeToDisk(username);
 					// Send to backup servers
-					log("Sending command to backups...");
 					backup(command);
-					log("Updating state and server...");
 					command.updateState();
 					command.updateServer(server, this);
 				}
@@ -182,6 +178,7 @@ public class Server implements Runnable
 
     public void backup(Command command)
     {
+		log("Updating backups...");
         for (Connection connection : backupServers)
         {
             connection.send(command);
@@ -220,12 +217,13 @@ public class Server implements Runnable
 		try {
 			FileWriter fw = new FileWriter(playerFile.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-
+			log("here");
 			//get the player's position to write to disk
-			synchronized (GameState.getInstance()) {
-				Player player = GameState.getInstance().getPlayers().get(username);
-				bw.write(player.x + " " + player.y);
-			}
+			Player player = GameState.getInstance().getPlayers().get(username);
+			log("player.x: " + player.x + " player.y: " + player.y);
+			bw.write(player.x + " " + player.y);
+			log("here3");
+
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();

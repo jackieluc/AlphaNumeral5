@@ -39,7 +39,9 @@ public class MoveCommand extends Command
         {
             Logger.log("username: " + username + " @ " + x + ", " + y);
 
-//            server.backup(this);
+            Logger.log("Updating position on hard-disk...");
+            server.writeToDisk(username);
+            server.backup(this);
             server.sendAll(this);
         }
     }

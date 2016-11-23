@@ -20,7 +20,7 @@ public class GameState
     public GameState()
     {
         // Initialize vars
-        players = new HashMap<String, Player>();
+        players = new HashMap<>();
         // Load map
         map = new Map();
 
