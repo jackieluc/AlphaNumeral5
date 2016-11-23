@@ -114,9 +114,9 @@ public class Server implements Runnable
             try
             {
                 super.close();
-
-                clients.remove(this);
-                inGameClients.remove(username);
+//TODO: fix so that if a user disconnects, don't remove them until after 30 seconds (aka let them try to reconnect)
+//                clients.remove(this);
+//                inGameClients.remove(username);
 
                 log("User \"" + username + "\" disconnected!");
             }
@@ -217,13 +217,10 @@ public class Server implements Runnable
 		try {
 			FileWriter fw = new FileWriter(playerFile.getAbsoluteFile());
 			BufferedWriter bw = new BufferedWriter(fw);
-			log("here");
+
 			//get the player's position to write to disk
 			Player player = GameState.getInstance().getPlayers().get(username);
-			log("player.x: " + player.x + " player.y: " + player.y);
 			bw.write(player.x + " " + player.y);
-			log("here3");
-
 			bw.close();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -235,23 +232,35 @@ public class Server implements Runnable
 	 * @param username
 	 * @return array of strings, where [0] is x position and [1] is y position
 	 */
-	public String[] readFromDisk(String username)
+	public int[] readFromDisk(String username)
 	{
 		FileReader fr;
-		String[] positions = null;
+		int[] positions = new int[2];
 		String directoryPath = "./PlayerData/";
 		try {
 			File playerFile = new File(directoryPath + username + ".txt");
 			fr = new FileReader(playerFile.getAbsolutePath());
 			BufferedReader br = new BufferedReader(fr);
 
-			positions = br.readLine().split(" ");
+			String[] pos = br.readLine().split(" ");
 
+			positions[0] = Integer.parseInt(pos[0]);
+			positions[1] = Integer.parseInt(pos[1]);
+
+			fr.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return positions;
+	}
+
+	/**
+	 * TODO: implement such that when the primary server starts up, read all the files from the storage
+	 */
+	public void readAllFilesFromDisk()
+	{
+
 	}
 
     private void sendSerialized(ArrayList<? extends Connection> list, byte[] bytes)

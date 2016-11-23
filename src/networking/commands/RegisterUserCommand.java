@@ -48,6 +48,24 @@ public class RegisterUserCommand extends Command
 
                 Logger.log("New user \"" + username + "\" joined the game!");
             }
+/*
+            else
+            {
+                if (GameState.getInstance().getPlayers().get(username) != null) {
+                    //there exists a player
+                    Logger.log("Reading from hard-disk...");
+                    int[] positions = server.readFromDisk(username);
+
+                    //update with the current position of the player
+                    System.out.println("Welcome back, " + username + "!");
+
+                    clientConnection.username = username;
+                    MoveCommand moveCommand = new MoveCommand(username, positions[0], positions[1]);
+                    server.sendAll(moveCommand);
+                    getExistingPlayers(clientConnection);
+                }
+            }
+*/
         }
     }
 
