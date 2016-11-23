@@ -29,7 +29,8 @@ public class ServerMain
         // Create a new game state
         new GameState();
         Logger.debug = true;
-        SetupServer(args[0]);
+        int port = 5000;
+        SetupServer(port+"");
 
      
     }

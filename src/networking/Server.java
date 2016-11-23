@@ -22,6 +22,7 @@ import static debug.Logger.log;
 
 public class Server implements Runnable
 {
+	boolean backup=false;
 	 private static boolean isRunning;
 	private int port = -1;
     //
@@ -68,23 +69,26 @@ public class Server implements Runnable
 		{
 			Command command;
 
+			//System.err.println("backup>> "+ backup);
 			// Tell the user to register (no commands will be accepted until successful registration)
 			serializer.writeToSocket(new RegisterUserCommand(null));
 
 			// Wait for commands from client
 			while ((command = (Command) serializer.readFromSocket()) != null)
 			{
+				
 				//
 				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
 				//
 				if (command != null && command.verify())
 				{
 					Logger.log("Is valid command");
+					 backup(command);
 					command.updateState();
 					command.updateServer(server, this);
-
                     // Send to backup servers
-                    backup(command);
+                   
+                  
 				}
 			}
 
@@ -220,7 +224,8 @@ public class Server implements Runnable
 		}
 		catch (Exception ex)
 		{
-			log("Error creating server socket!");
+			
+			log("Error creating server socket! at "+port);
 			log(ex);
 		}
 
@@ -239,17 +244,45 @@ public class Server implements Runnable
      */
     void connectToMaster()
     {
-    	
+    	executorService = Executors.newCachedThreadPool();
+     //	serverSocket = createServerSocket();
         ServerList serverList = new ServerList(port);
        // System.err.println("returning from server list");
         Socket socket = serverList.getConnectionToMasterServer();
-
         if (socket != null)
         {
+        	//serverSocket = createServerSocket();
+        	//Connection connection = new Connection(socket);
+        	backup=true;
+        	//log(" **** primary found at "+ socket + "****"
+        	//		+ "****starting server as a backup ****");
+        	// connection.send(new RegisterBackupServerCommand());     	        	
+       /**  if (serverSocket != null)
+			{       		
+				while (true)
+				{
+					log("backup Waiting for connection...");
+					try{
+						//Socket clientSocket = serverSocket.accept();
+					ClientConnection clientConnection = new ClientConnection(this, serverSocket.accept());
+					// sendBackupSignal(clientSocket);
+					executorService.submit(clientConnection);
+					}catch (Exception ex)
+					{
+						log("Error in server loop!");
+						log(ex);
+					}
+				}
+			}**/
+			
+        	//executorService = Executors.newCachedThreadPool();
+        	//serverSocket = createServerSocket();   	
+        	backup=true;
+        	//ClientConnection clientConnection = null;
         	log(" **** primary found at "+ socket + "****"
         			+ "****starting server as a backup ****");
         //	System.err.println("line 143 BS socker "+socket.getPort());
-            MasterServerConnection connection = new MasterServerConnection(socket);
+            MasterServerConnection connection = new MasterServerConnection(this,socket);
             Thread thread = new Thread(connection);
             thread.start();
         }
@@ -280,7 +313,70 @@ public class Server implements Runnable
 			}
 
         }
+    
     }
     
+    
+    // Sends a 0 to connected clients to signify that this is a backup
+    void sendBackupSignal(Socket clientSocket)
+    {
+        try
+        {
+            clientSocket.getOutputStream().write(0);
+        }
+        catch (IOException ex)
+        {
+            log("Error sending Master signal");
+        }
+    }
+    
+   /////////////////////
+    class MasterServerConnection extends Connection implements Runnable
+    {
+    //	private static boolean isRunning;
+    	ClientConnection clientConnection;
+    	Server server;
+        public MasterServerConnection(Server server, Socket socket)
+        {
+        	
+            super(socket);
+            this.server=server;
+
+       
+        }
+
+        @Override
+        public void run()
+        {
+            Command command;
+
+            // Wait for commands from client
+            while ((command = (Command) serializer.readFromSocket()) != null)
+            {
+                //
+                log("Command recieved from Master Server of type " + command);
+                //
+                command.updateState();
+                System.err.println("Backup Client list size "+ server.inGameClients.size());
+                //command.updateServer(server,clientConnection);
+                
+            }
+            System.err.println("server crahsed");
+
+            // close everything
+            try
+            {
+            	connectToMaster();
+            	System.err.println("closing");
+                isRunning = false;
+                close();
+            }
+            catch (IOException ex)
+            {
+                Logger.log("Error closing master server connection");
+            }
+   
+        }
+    }
     
 } // networking.Server

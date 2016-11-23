@@ -21,8 +21,9 @@ public abstract class Command implements Serializable
 
     /**
      * Updates the game state (both client and server
+     * @param string 
      */
-    public void updateState(){}
+    public void updateState( ){}
 
     /**
      * Updates the client

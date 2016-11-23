@@ -8,7 +8,6 @@ import debug.Logger;
 import game.GameRenderer;
 import networking.commands.Command;
 import networking.commands.MoveCommand;
-
 import static debug.Logger.log;
 
 public class Client implements Runnable
@@ -73,7 +72,12 @@ public class Client implements Runnable
                 command.updateClient(this);
             }
         }
-
+        try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+        run();
         // TODO try to reconnect
         log("Disconnected from server...");
 
