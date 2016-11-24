@@ -50,12 +50,4 @@ public class ReadFile
         }
         return positions;
     }
-
-    /**
-     * TODO: implement such that when the primary server starts up, read all the files from the storage
-     */
-    public void readAllFilesFromDisk()
-    {
-
-    }
 }

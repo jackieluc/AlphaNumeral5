@@ -45,10 +45,6 @@ public class MoveCommand extends Command
             new WriteFile(username).writeToDisk();
             server.backup(this);
             server.sendAll(this);
-
-            Logger.log("Testing read:");
-            int[] pos = new ReadFile(username).readFromDisk();
-            Logger.log(username + " is @ " + pos[0] + " " + pos[1]);
         }
     }
 

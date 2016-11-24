@@ -30,9 +30,14 @@ public class GameController implements KeyListener
     @Override
     public void keyPressed(KeyEvent e)
     {
-        Player player = GameState.getInstance().getPlayers().get(client.username);
-        int x = player.x;
-        int y = player.y;
+        int x = -1;
+        int y = -1;
+
+        synchronized(GameState.getInstance()) {
+            Player player = GameState.getInstance().getPlayers().get(client.username);
+            x = player.x;
+            y = player.y;
+        }
 
         switch (e.getKeyCode())
         {

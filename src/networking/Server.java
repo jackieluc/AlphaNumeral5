@@ -70,8 +70,9 @@ public class Server implements Runnable
 			while ((command = (Command) serializer.readFromSocket()) != null) {
 				//
 				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command.getClass().toString());
-				//
-				if (command.verify()) {
+
+				if (command.verify())
+				{
 					// Send to backup servers
 					backup(command);
 					command.updateState();
@@ -116,7 +117,7 @@ public class Server implements Runnable
                 super.close();
 //TODO: fix so that if a user disconnects, don't remove them until after 30 seconds (aka let them try to reconnect)
 //                clients.remove(this);
-//                inGameClients.remove(username);
+                inGameClients.remove(username);
 
                 log("User \"" + username + "\" disconnected!");
             }
