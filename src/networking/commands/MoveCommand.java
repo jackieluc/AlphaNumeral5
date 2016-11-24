@@ -34,8 +34,6 @@ public class MoveCommand extends Command
     @Override
     public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
-        Logger.log("VALID MOVE COMMAND");
-
         // TODO only send to close by players
         if (verify())
         {

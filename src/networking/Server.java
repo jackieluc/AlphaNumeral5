@@ -115,8 +115,7 @@ public class Server implements Runnable
             try
             {
                 super.close();
-//TODO: fix so that if a user disconnects, don't remove them until after 30 seconds (aka let them try to reconnect)
-//                clients.remove(this);
+                clients.remove(this);
                 inGameClients.remove(username);
 
                 log("User \"" + username + "\" disconnected!");
@@ -149,7 +148,7 @@ public class Server implements Runnable
             for (HashMap.Entry<String, Player> p : GameState.getInstance().getPlayers().entrySet())
             {
                 send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
-				log("username: " + p.getKey() + " x: " + p.getValue().x + " y:" + p.getValue().y);
+				log("server.updatestate() - username: " + p.getKey() + " x: " + p.getValue().x + " y:" + p.getValue().y);
             }
         }
 	}

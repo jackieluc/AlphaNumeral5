@@ -26,9 +26,9 @@ public class ReadFile
         this.playerFile = new File(directoryPath + filename);
         this.pathOfFile = playerFile.getAbsoluteFile();
     }
+
     /**
      * retrieve the position stored in the player's file
-     * @param username
      * @return array of strings, where [0] is x position and [1] is y position
      */
     public int[] readFromDisk()
@@ -49,5 +49,10 @@ public class ReadFile
             e.printStackTrace();
         }
         return positions;
+    }
+
+    public boolean exists()
+    {
+        return playerFile.exists();
     }
 }
