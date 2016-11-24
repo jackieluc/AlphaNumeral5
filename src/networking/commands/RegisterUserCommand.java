@@ -59,6 +59,12 @@ public class RegisterUserCommand extends Command
         }
     }
 
+    /**
+     * put the player on the server with the default position of (1,1)
+     * @param server - the primary server
+     * @param username - the username entered by the user
+     * TODO: make the default position be random
+     */
     private void createPlayer(Server server, String username)
     {
         // TODO only send to close by players
@@ -66,6 +72,13 @@ public class RegisterUserCommand extends Command
         server.sendAll(moveCommand);
     }
 
+    /**
+     * put the player on the server with a specified position of (x,y)
+     * @param server - the primary server
+     * @param username - the username entered by the user
+     * @param x - x position of the player
+     * @param y - y position of the player
+     */
     public void createPlayer(Server server, String username, int x, int y)
     {
         MoveCommand moveCommand = new MoveCommand(username, x, y);
