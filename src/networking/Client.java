@@ -66,14 +66,10 @@ public class Client implements Runnable
         Command command;
         while ((command = (Command) serializer.readFromSocket()) != null)
         {
-            //
-            if (command != null)
-            {
-                log("Command recieved of type " + command);
+            log("Command recieved of type " + command.getClass().toString());
 
-                command.updateState();
-                command.updateClient(this);
-            }
+            command.updateState();
+            command.updateClient(this);
         }
 
         // TODO try to reconnect

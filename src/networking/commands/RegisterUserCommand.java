@@ -17,7 +17,7 @@ import java.util.Scanner;
  */
 public class RegisterUserCommand extends Command
 {
-    public String username;
+    private String username;
     private boolean registrationSuccessful;
 
     public RegisterUserCommand(String username)
@@ -28,9 +28,11 @@ public class RegisterUserCommand extends Command
     @Override
     public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
-        synchronized (server.inGameClients) {
+        synchronized (server.inGameClients)
+        {
 
-            if (server.inGameClients.get(username) == null) {
+            if (server.inGameClients.get(username) == null)
+            {
                 // add to dictionary of in-game clients
                 server.inGameClients.put(username, clientConnection);
                 // Set clientConnection username
@@ -51,11 +53,18 @@ public class RegisterUserCommand extends Command
                     // create player on the map
                     createPlayer(server, username);
                 }
+
+                getExistingPlayers(clientConnection);
+
+                Logger.log("User:  " + username + " joined the game!");
             }
+            else
+            {
+                // there exists a player with that username in the game, resend register command
+                clientConnection.send(this);
 
-            getExistingPlayers(clientConnection);
-
-            Logger.log("User:  " + username + " joined the game!");
+                Logger.log("Client wanted to login as: \"" + username + "\" but one already exists. Resend register user command.");
+            }
         }
     }
 
@@ -79,7 +88,7 @@ public class RegisterUserCommand extends Command
      * @param x - x position of the player
      * @param y - y position of the player
      */
-    public void createPlayer(Server server, String username, int x, int y)
+    private void createPlayer(Server server, String username, int x, int y)
     {
         MoveCommand moveCommand = new MoveCommand(username, x, y);
         server.sendAll(moveCommand);
@@ -114,9 +123,9 @@ public class RegisterUserCommand extends Command
             Scanner scanner = new Scanner(System.in);
 
             if (username != null)
-                System.out.println("User \"" + username + "\" already exists!");
+                System.out.println("Username \"" + username + "\" is currently in the game! Please pick a new username");
 
-            System.out.print("Enter new username:");
+            System.out.print("Enter new username: ");
             username = scanner.next();
 
             // Try to register username on server
@@ -124,8 +133,11 @@ public class RegisterUserCommand extends Command
 
             // Set username
             client.username = username;
+
             // Show the actual game window
+// TODO: only display the screen if registry is correct
             GameRenderer.current.setVisible(true);
+
             // Log
             Logger.log("Joined game with username " + username + "!");
 //        }

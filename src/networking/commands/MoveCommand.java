@@ -14,8 +14,8 @@ import networking.Server;
  */
 public class MoveCommand extends Command
 {
-    public final String username;
-    public final int x, y;
+    private final String username;
+    private final int x, y;
 
     public MoveCommand(String username, int x, int y)
     {
@@ -67,8 +67,5 @@ public class MoveCommand extends Command
     }
 
     @Override
-    public void updateClient(Client client)
-    {
-        GameRenderer.current.redraw();
-    }
+    public void updateClient(Client client) { GameRenderer.current.redraw(); }
 }
