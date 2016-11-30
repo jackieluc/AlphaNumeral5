@@ -84,14 +84,13 @@ public class Server implements Runnable
 				//
 				if (command.verify())
 				{
-					if (command instanceof RegisterBackupServerCommand)
-						command.updateServer(server, this);
-					else
-					{
-						backup(command);
-						command.updateState();
-						command.updateServer(server, this);
-					}
+					backup(command);
+					command.updateState();
+					command.updateServer(server, this);
+					
+					if(command instanceof MoveCommand)
+	                	new WriteFile(((MoveCommand) command).username).writeToDisk();
+	                
 				}
 			}
 
@@ -167,8 +166,8 @@ public class Server implements Runnable
 	            {
 	                send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
 	                
-	                Logger.log("Writing to disk on backup...");
-	                new WriteFile(p.getKey()).writeToDisk();
+//	                Logger.log("Writing to disk on backup...");
+//	                new WriteFile(p.getKey()).writeToDisk();
 	            }
         	}
         }
@@ -368,6 +367,10 @@ public class Server implements Runnable
                 log("Command recieved from Master Server of type " + command);
                 //
                 command.updateState();
+                
+                if(command instanceof MoveCommand)
+                	new WriteFile(((MoveCommand) command).username).writeToDisk();
+                
 //                System.err.println("Backup Client list size "+ server.inGameClients.size());
                 //command.updateServer(server,clientConnection);
                 

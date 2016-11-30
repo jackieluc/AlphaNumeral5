@@ -11,7 +11,7 @@ public class RegisterBackupServerCommand extends Command
     @Override
     public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
-    	System.err.println("Registerback 14" );
+//    	System.err.println("Registerback 14" );
         // Close the client connection (this is not a client)
         clientConnection.prepareForTransfer();
         //

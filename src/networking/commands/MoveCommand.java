@@ -34,8 +34,8 @@ public class MoveCommand extends Command
     public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
         // TODO only send to close by players
-    	Logger.log("Writing to disk...");
-    	new WriteFile(username).writeToDisk();
+//    	Logger.log("Writing to disk...");
+//    	new WriteFile(username).writeToDisk();
     	server.backup(this);
         server.sendAll(this);
     }
