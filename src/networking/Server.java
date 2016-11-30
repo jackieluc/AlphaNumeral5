@@ -80,12 +80,15 @@ public class Server implements Runnable
 				//
 				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
 				//
-				if (command != null && command.verify())
+				if (command.verify())
 				{
+					//if (command instanceof MoveCommand)
+					
 					Logger.log("Is valid command");
-					 backup(command);
+					backup(command);
 					command.updateState();
 					command.updateServer(server, this);
+					
                     // Send to backup servers
                    
                   

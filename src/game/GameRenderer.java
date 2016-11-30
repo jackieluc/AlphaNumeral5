@@ -102,7 +102,8 @@ public class GameRenderer extends JFrame implements Runnable
 
     private void drawMap()
     {
-        Map map = GameState.current.map;
+    	HashMap<String,Player> players = GameState.current.players;
+        Map map = GameState.getInstance().map;
 
         for (int x = 0; x < map.getWidth(); x++)
         {
@@ -119,6 +120,7 @@ public class GameRenderer extends JFrame implements Runnable
 
         for (Player p : players.values())
         {
+        	System.err.println(p.x+" "+ p.y);
             terminal.write('B', p.x, p.y);
             Logger.log(p.username + " @ (" + p.x + "," + p.y + ")");
         }

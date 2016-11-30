@@ -34,16 +34,23 @@ public class GameController implements KeyListener
         switch (e.getKeyCode())
         {
             case KeyEvent.VK_RIGHT:
-                client.send(new MoveCommand(client.username, player.x + 1, player.y));
+            	if (CheckValid.checkx(player.x, e))
+            		client.send(new MoveCommand(client.username, player.x + 1, player.y));
                 break;
+                
             case KeyEvent.VK_LEFT:
-                client.send(new MoveCommand(client.username, player.x -1, player.y));
-                break;
+            	if (CheckValid.checkx(player.x, e))
+            		client.send(new MoveCommand(client.username, player.x - 1, player.y));
+                 break;
+                 
             case KeyEvent.VK_UP:
-                client.send(new MoveCommand(client.username, player.x , player.y-1));
+            	if (CheckValid.checky(player.y, e))
+            		client.send(new MoveCommand(client.username, player.x, player.y-1));
                 break;
+                
             case KeyEvent.VK_DOWN:
-                client.send(new MoveCommand(client.username, player.x, player.y+1));
+            	if (CheckValid.checky(player.y, e))
+            			client.send(new MoveCommand(client.username, player.x, player.y+1));
                 break;
         }
     }

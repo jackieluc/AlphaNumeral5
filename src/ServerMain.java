@@ -13,6 +13,8 @@ import networking.Client;
 import networking.Server;
 
 import java.awt.*;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 public class ServerMain
 {
@@ -26,10 +28,16 @@ public class ServerMain
 
     public static void main(String[] args)
     {
+    	try {
+			System.err.println("connect to "+ InetAddress.getLocalHost().getHostAddress());
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         // Create a new game state
-        new GameState();
+        GameState.getInstance();
         Logger.debug = true;
-        int port = 5000;
+        int port = 5001;
         SetupServer(port+"");
 
      

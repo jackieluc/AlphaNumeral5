@@ -35,7 +35,7 @@ public class ClientMain {
 	public static void main(String[] args) {
 		   // Create a new game state
 		Logger.debug=true;
-        new GameState();
+        GameState.getInstance();
 		SetupClient();
 
 	}

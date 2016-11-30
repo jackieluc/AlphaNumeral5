@@ -3,6 +3,7 @@ package networking.commands;
 import debug.Logger;
 import game.GameRenderer;
 import game.GameState;
+import game.Map;
 import game.Player;
 import networking.Client;
 import networking.Server;
@@ -25,8 +26,14 @@ public class MoveCommand extends Command
     @Override
     public boolean verify()
     {
-        return super.verify();
-    }
+    	
+    	
+    	
+    	System.err.println("inside erify");
+       // return super.verify();
+    //	return GameState.current.map.validMove(x, y);
+        return GameState.getInstance().getMap().validMove(x, y);
+    }//
 
     @Override
     public void updateServer(Server server, Server.ClientConnection clientConnection)
@@ -51,7 +58,7 @@ public class MoveCommand extends Command
                 Logger.log("Created new player " + username);
             }
 
-            Logger.log(x +" " + y);
+            Logger.log(x +"," + y);
             player.x = x;
             player.y = y;
         }
