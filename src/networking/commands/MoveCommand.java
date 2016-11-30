@@ -1,8 +1,10 @@
 package networking.commands;
 
+import FileIO.WriteFile;
 import debug.Logger;
 import game.GameRenderer;
 import game.GameState;
+import game.Map;
 import game.Player;
 import networking.Client;
 import networking.Server;
@@ -25,19 +27,17 @@ public class MoveCommand extends Command
     @Override
     public boolean verify()
     {
-        return GameState.current.map.insideMap(x, y);
+        return GameState.getInstance().getMap().validMove(x, y);
     }
 
     @Override
     public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
-        Logger.log("VALID MOVE COMMAND");
-
         // TODO only send to close by players
-        if (GameState.current.map.validMove(x, y))
-        {
-            server.sendAll(this);
-        }
+    	Logger.log("Writing to disk...");
+    	new WriteFile(username).writeToDisk();
+    	server.backup(this);
+        server.sendAll(this);
     }
 
     @Override
@@ -54,9 +54,9 @@ public class MoveCommand extends Command
                 Logger.log("Created new player " + username);
             }
 
-            Logger.log(x +" " + y);
             player.x = x;
             player.y = y;
+            Logger.log("Updating state: " + player.username + " is @ (" + player.x + ", " + player.y + ")");
         }
     }
 

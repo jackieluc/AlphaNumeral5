@@ -2,7 +2,6 @@ package game;
 
 import debug.Logger;
 import networking.Client;
-import networking.commands.Command;
 import networking.commands.MoveCommand;
 
 import java.awt.event.KeyEvent;
@@ -31,30 +30,28 @@ public class GameController implements KeyListener
     public void keyPressed(KeyEvent e)
     {
         Player player = GameState.current.players.get(client.username);
-        int x = player.x;
-        int y = player.y;
 
         switch (e.getKeyCode())
         {
             case KeyEvent.VK_RIGHT:
-                x++;
+            	if (CheckValid.checkx(player.x, e))
+            		client.send(new MoveCommand(client.username, player.x + 1, player.y));
                 break;
+                
             case KeyEvent.VK_LEFT:
-                x--;
-                break;
+            	if (CheckValid.checkx(player.x, e))
+            		client.send(new MoveCommand(client.username, player.x - 1, player.y));
+                 break;
+                 
             case KeyEvent.VK_UP:
-                y--;
+            	if (CheckValid.checky(player.y, e))
+            		client.send(new MoveCommand(client.username, player.x, player.y-1));
                 break;
+                
             case KeyEvent.VK_DOWN:
-                y++;
+            	if (CheckValid.checky(player.y, e))
+            			client.send(new MoveCommand(client.username, player.x, player.y+1));
                 break;
-        }
-
-        Command command = new MoveCommand(client.username, x, y);
-
-        if (command.verify())
-        {
-            client.send(command);
         }
     }
 

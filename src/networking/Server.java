@@ -3,8 +3,10 @@ package networking;
 import debug.Logger;
 import game.GameState;
 import game.Player;
+//import networking.BackupServer.MasterServerConnection;
 import networking.commands.Command;
 import networking.commands.MoveCommand;
+import networking.commands.RegisterBackupServerCommand;
 import networking.commands.RegisterUserCommand;
 
 import java.io.IOException;
@@ -15,11 +17,15 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import FileIO.WriteFile;
+
 import static debug.Logger.log;
 
 
 public class Server implements Runnable
 {
+	boolean backup=false;
+	 private static boolean isRunning;
 	private int port = -1;
     //
     private ServerSocket serverSocket;
@@ -31,16 +37,6 @@ public class Server implements Runnable
     public ArrayList<ClientConnection> clients;
     //
     public ArrayList<BackupServerConnection> backupServers;
-
-	public Server(int port)
-	{
-		this.port = port;
-
-		clients = new ArrayList<>(100);
-		backupServers = new ArrayList<>(10);
-
-		inGameClients = new HashMap<String, ClientConnection>();
-	}
 
     /**
      * Manages a client (Listens on another thread, sends commands)
@@ -75,23 +71,27 @@ public class Server implements Runnable
 		{
 			Command command;
 
+			//System.err.println("backup>> "+ backup);
 			// Tell the user to register (no commands will be accepted until successful registration)
 			serializer.writeToSocket(new RegisterUserCommand(null));
 
 			// Wait for commands from client
 			while ((command = (Command) serializer.readFromSocket()) != null)
 			{
+				
 				//
 				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
 				//
 				if (command.verify())
 				{
-					Logger.log("Is valid command");
-					command.updateState();
-					command.updateServer(server, this);
-
-                    // Send to backup servers
-                    backup(command);
+					if (command instanceof RegisterBackupServerCommand)
+						command.updateServer(server, this);
+					else
+					{
+						backup(command);
+						command.updateState();
+						command.updateServer(server, this);
+					}
 				}
 			}
 
@@ -161,11 +161,27 @@ public class Server implements Runnable
          */
         private void updateState()
         {
-            for (HashMap.Entry<String, Player> p : GameState.current.players.entrySet())
-            {
-                send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
-            }
+        	synchronized (GameState.current)
+        	{
+	            for (HashMap.Entry<String, Player> p : GameState.current.players.entrySet())
+	            {
+	                send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
+	                
+	                Logger.log("Writing to disk on backup...");
+	                new WriteFile(p.getKey()).writeToDisk();
+	            }
+        	}
         }
+	}
+	
+	public Server(int port)
+	{
+		this.port = port;
+
+        clients = new ArrayList<>(100);
+        backupServers = new ArrayList<>(10);
+
+		inGameClients = new HashMap<String, ClientConnection>();
 	}
 
     /**
@@ -207,6 +223,7 @@ public class Server implements Runnable
 
     /**
      * Creates a server socket
+     * @return
      */
 	private ServerSocket createServerSocket()
 	{
@@ -216,7 +233,8 @@ public class Server implements Runnable
 		}
 		catch (Exception ex)
 		{
-			log("Error creating server socket!");
+			
+			log("Error creating server socket! at "+port);
 			log(ex);
 		}
 
@@ -226,25 +244,150 @@ public class Server implements Runnable
 	@Override
 	public void run()
 	{
-		try
-		{
-			serverSocket = createServerSocket();
-			executorService = Executors.newCachedThreadPool();
-
-			if (serverSocket != null)
+		connectToMaster();
+		
+    } // run
+	
+	 /**
+     * Connect to the master server
+     */
+    void connectToMaster()
+    {
+    	executorService = Executors.newCachedThreadPool();
+     //	serverSocket = createServerSocket();
+        ServerList serverList = new ServerList(port);
+       // System.err.println("returning from server list");
+        Socket socket = serverList.getConnectionToMasterServer();
+        if (socket != null)
+        {
+        	//serverSocket = createServerSocket();
+        	//Connection connection = new Connection(socket);
+        	backup=true;
+        	//log(" **** primary found at "+ socket + "****"
+        	//		+ "****starting server as a backup ****");
+        	// connection.send(new RegisterBackupServerCommand());     	        	
+       /**  if (serverSocket != null)
+			{       		
+				while (true)
+				{
+					log("backup Waiting for connection...");
+					try{
+						//Socket clientSocket = serverSocket.accept();
+					ClientConnection clientConnection = new ClientConnection(this, serverSocket.accept());
+					// sendBackupSignal(clientSocket);
+					executorService.submit(clientConnection);
+					}catch (Exception ex)
+					{
+						log("Error in server loop!");
+						log(ex);
+					}
+				}
+			}**/
+			
+        	//executorService = Executors.newCachedThreadPool();
+        	//serverSocket = createServerSocket();   	
+        	backup=true;
+        	//ClientConnection clientConnection = null;
+        	log(" **** primary found at "+ socket + "****"
+        			+ "****starting server as a backup ****");
+        //	System.err.println("line 143 BS socker "+socket.getPort());
+            MasterServerConnection connection = new MasterServerConnection(this,socket);
+            Thread thread = new Thread(connection);
+            thread.start();
+        }
+        
+        
+        
+ 
+       ///////////////
+        else{
+        	log("**** no primary found, starting server as primary ****");
+        	executorService = Executors.newCachedThreadPool();
+        	serverSocket = createServerSocket();
+        	if (serverSocket != null)
 			{
+				
 				while (true)
 				{
 					log("Waiting for connection...");
+					try{
 					ClientConnection clientConnection = new ClientConnection(this, serverSocket.accept());
 					executorService.submit(clientConnection);
+					}catch (Exception ex)
+					{
+						log("Error in server loop!");
+						log(ex);
+					}
 				}
 			}
-		}
-		catch (Exception ex)
-		{
-			log("Error in server loop!");
-			log(ex);
-		}
-    } // run
+
+        }
+    
+    }
+    
+    
+    // Sends a 0 to connected clients to signify that this is a backup
+    void sendBackupSignal(Socket clientSocket)
+    {
+        try
+        {
+            clientSocket.getOutputStream().write(0);
+        }
+        catch (IOException ex)
+        {
+            log("Error sending Master signal");
+        }
+    }
+    
+   /////////////////////
+    class MasterServerConnection extends Connection implements Runnable
+    {
+    //	private static boolean isRunning;
+    	ClientConnection clientConnection;
+    	Server server;
+        public MasterServerConnection(Server server, Socket socket)
+        {
+        	
+            super(socket);
+            this.server=server;
+
+       
+        }
+
+        @Override
+        public void run()
+        {
+            Command command;
+            
+            serializer.writeToSocket(new RegisterBackupServerCommand());
+
+            // Wait for commands from client
+            while ((command = (Command) serializer.readFromSocket()) != null)
+            {
+                //
+                log("Command recieved from Master Server of type " + command);
+                //
+                command.updateState();
+//                System.err.println("Backup Client list size "+ server.inGameClients.size());
+                //command.updateServer(server,clientConnection);
+                
+            }
+            System.err.println("server crahsed");
+
+            // close everything
+            try
+            {
+            	connectToMaster();
+            	System.err.println("closing");
+                isRunning = false;
+                close();
+            }
+            catch (IOException ex)
+            {
+                Logger.log("Error closing master server connection");
+            }
+   
+        }
+    }
+    
 } // networking.Server
