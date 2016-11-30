@@ -3,7 +3,10 @@ package game;
 import debug.Logger;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
+
+import asciiPanel.AsciiPanel;
 
 /**
  * Created by Ahmed on 11/8/2016.
@@ -66,7 +69,6 @@ public class Map
             Logger.log(ex);
         }
     }
-
     public boolean insideMap(int x, int y)
     {
         if (x > 0 && x < width-1)
@@ -77,14 +79,18 @@ public class Map
 
         return false;
     }
-
     public boolean validMove(int x, int y)
     {
+    	HashMap<String,Player> players = GameState.current.players;
+    	 for (Player p : players.values())
+         {
+             if (p.x == x && p.y == y)
+            	 return false;
+         }
+    	
         if(!insideMap(x, y))
             return false;
 
-        if(tiles[y][x] != ' ')
-            return false;
 
         return true;
     }

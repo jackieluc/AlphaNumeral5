@@ -10,6 +10,7 @@ import networking.Server;
 import java.util.HashMap;
 import java.util.Scanner;
 
+
 /**
  * Created by Ahmed on 11/8/2016.
  */
@@ -41,16 +42,31 @@ public class RegisterUserCommand extends Command
                 server.inGameClients.put(username, clientConnection);
                 // Set clientConnection username
                 clientConnection.username = username;
-                // create player on the map
-                createPlayer(server, username);
-                //
-                getExistingPlayers(clientConnection);
 
-                Logger.log("New user \"" + username + "\" joined the game!");
+                //get the player if it exists on the server
+                if(GameState.getInstance().players.containsKey(username))
+                {
+                	updatePlayer(server, username);
+                    Logger.log("Welcome back " + username + "!");
+                }
+                else
+                {
+                    // create player on the map
+                	createPlayer(server, username);
+                	Logger.log("New user: " + username + ", joined the game!");
+                }
+                
+                getExistingPlayers(clientConnection);
             }
         }
     }
 
+    /**
+     * put the player on the server with the default position of (1,1)
+     * @param server - the primary server
+     * @param username - the username entered by the user
+     * TODO: make the default position be random
+     */
     private void createPlayer(Server server, String username)
     {
         // TODO only send to close by players
@@ -58,9 +74,24 @@ public class RegisterUserCommand extends Command
         server.sendAll(moveCommand);
     }
 
+    /**
+     * put the player on the server with a specified position of (x,y)
+     * @param server - the primary server
+     * @param username - the username entered by the user
+     */    
+    private void updatePlayer(Server server, String username) 
+    {
+    	synchronized (GameState.getInstance())
+    	{
+	    	Player player = GameState.getInstance().players.get(username);
+	        MoveCommand moveCommand = new MoveCommand(username, player.x, player.y);
+	        server.sendAll(moveCommand);
+    	}
+    }
+
     private void getExistingPlayers(Server.ClientConnection clientConnection)
     {
-        for (HashMap.Entry<String,Player> p : GameState.current.players.entrySet())
+        for (HashMap.Entry<String,Player> p : GameState.getInstance().players.entrySet())
         {
             if (!p.getKey().equals(username))
             {
@@ -86,8 +117,8 @@ public class RegisterUserCommand extends Command
             // Ask for new username
             Scanner scanner = new Scanner(System.in);
 
-            if (username != null)
-                System.out.println("User \"" + username + "\" already exists!");
+//            if (username != null)
+//                System.out.println("User \"" + username + "\" already exists!");
 
             System.out.print("Enter new username:");
             username = scanner.next();

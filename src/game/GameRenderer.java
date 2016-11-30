@@ -39,7 +39,7 @@ public class GameRenderer extends JFrame implements Runnable
         synchronized (GameState.current)
         {
             needsRedrawing = true;
-            Logger.log("REDRAW PLZ" + needsRedrawing);
+//            Logger.log("REDRAW PLZ" + needsRedrawing);
         }
     }
 
@@ -74,7 +74,7 @@ public class GameRenderer extends JFrame implements Runnable
                 //Logger.log(needsRedrawing);
                 if (needsRedrawing)
                 {
-                    Logger.log("REDRAW");
+//                    Logger.log("REDRAW");
                     synchronized (GameState.current)
                     {
                         drawMap();
@@ -102,7 +102,8 @@ public class GameRenderer extends JFrame implements Runnable
 
     private void drawMap()
     {
-        Map map = GameState.current.map;
+//    	HashMap<String,Player> players = GameState.current.players;
+        Map map = GameState.getInstance().map;
 
         for (int x = 0; x < map.getWidth(); x++)
         {
@@ -115,12 +116,28 @@ public class GameRenderer extends JFrame implements Runnable
 
     private void drawPlayers()
     {
-        HashMap<String,Player> players = GameState.current.players;
-
-        for (Player p : players.values())
-        {
-            terminal.write('B', p.x, p.y);
-            Logger.log(p.username + " @ (" + p.x + "," + p.y + ")");
-        }
+    	char letter = 'a';
+    	synchronized (GameState.current)
+    	{
+	        HashMap<String,Player> players = GameState.current.players;
+	
+	        for (Player p : players.values())
+	        {
+	        	String username = p.username;
+	        	
+	        	if (username.equalsIgnoreCase("Jackie"))
+	        		letter = 'J';
+	        	else if (username.equalsIgnoreCase("Emil"))
+	        		letter = 'E';
+	        	else if (username.equalsIgnoreCase("Ahmad"))
+	        		letter = 'A';
+	        	else if (username.equalsIgnoreCase("Ahmed"))
+	        		letter = 'a';
+	        	else
+	        		letter = 'z';
+	        	
+	        	terminal.write(letter, p.x, p.y);
+	        }
+    	}
     }
 }
