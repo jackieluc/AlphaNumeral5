@@ -56,7 +56,7 @@ public class ServerList
         	//System.err.println("inside master ");
            // Logger.log("Trying to connect to " + address);
 
-            if ((socket = connect(address)) != null )
+            if ((socket = connect(address)) != null && address.getPort() != port)
             {
                 Logger.log("Connected to " + address);
 
