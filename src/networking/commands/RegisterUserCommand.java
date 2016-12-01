@@ -1,5 +1,6 @@
 package networking.commands;
 
+import FileIO.ReadFile;
 import debug.Logger;
 import game.GameRenderer;
 import game.GameState;
@@ -9,6 +10,8 @@ import networking.Server;
 
 import java.util.HashMap;
 import java.util.Scanner;
+
+import static game.GameState.current;
 
 
 /**
@@ -43,12 +46,35 @@ public class RegisterUserCommand extends Command
                 // Set clientConnection username
                 clientConnection.username = username;
 
-                //get the player if it exists on the server
+                // prepare to read a file with the same name as "username"
+                ReadFile playerFile = new ReadFile(username);
+
+                // get the player if it exists on the server
                 if(GameState.getInstance().players.containsKey(username))
                 {
                 	updatePlayer(server, username);
                     Logger.log("Welcome back " + username + "!");
                 }
+                // get the player if it exists in file
+                else if (playerFile.exists())
+                {
+                    Logger.log("Found: " + username + "... Reading data from file...");
+
+                    // get the positions from the file and create a new player and add it back into the system
+                    int[] pos = playerFile.readFromDisk();
+                    Player player = new Player(username);
+                    player.x = pos[0];
+                    player.y = pos[1];
+
+                    synchronized (GameState.getInstance())
+                    {
+                        GameState.getInstance().players.put(username, player);
+                    }
+
+                    updatePlayer(server, username);
+                    Logger.log("Welcome back " + username + "!");
+                }
+                // create a new user
                 else
                 {
                     // create player on the map

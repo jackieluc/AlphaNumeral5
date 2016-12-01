@@ -31,7 +31,7 @@ public class WriteFile
      */
     public void writeToDisk()
     {
-        //create the "PLayerData" directory if it doesn't exist
+        //create the "PlayerData" directory if it doesn't exist
         if(!directory.exists())
             directory.mkdir();
 
