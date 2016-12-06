@@ -2,7 +2,7 @@
 public class Election {
 	public GroupManager gm;
 	public String current_leader = "";
-	public long time = 5000;
+	//public long time = 5000;
 	public Thread leader;
 	public Object electionLock = new Object();
 	public boolean newLeaderFound = false;
@@ -11,7 +11,7 @@ public class Election {
 		gm = GroupManager.getInstance();
 	}
 	
-	public void waitForLeader() {
+	public void waitForLeader(long time) {
 		leader = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -37,13 +37,24 @@ public class Election {
 	
 	public String elect(String ip) {
 		synchronized(electionLock) {
+			System.out.println("ELECT " + ip + " gm.ip:" + gm.ip + " current_leader: " + current_leader);
 			newLeaderFound = false;
 			if(ip.compareTo(current_leader) > 0) {
 				if(leader != null) {
 					leader.interrupt();
 				}
-				current_leader = ip;
-				waitForLeader();
+				if(ip.compareTo(gm.ip) > 0) {
+					current_leader = ip;
+					waitForLeader(10000);
+				} else {
+					current_leader = gm.ip;
+				}
+			}
+			if(current_leader.equals(gm.ip)) {
+				if(leader != null) {
+					leader.interrupt();
+				}
+				waitForLeader(5000);
 			}
 			return current_leader;
 		}
@@ -53,11 +64,15 @@ public class Election {
 		synchronized(electionLock) {
 			current_leader = "";
 			elect(gm.ip);
+			gm.multicast(new ElectionCommand(gm.ip));
 		}
 	}
 	
 	public void newLeader(String ip) {
 		synchronized(electionLock) {
+			if(ip.equals(gm.ip)) {
+				return;
+			}
 			if(newLeaderFound) {
 				return;
 			}
@@ -65,6 +80,7 @@ public class Election {
 			if(leader != null) {
 				leader.interrupt();
 			}
+			System.out.println("New leader: " + ip);
 			gm.leader_ip = ip;
 			gm.isLeaderAlive();
 		}

@@ -24,6 +24,7 @@ public class GroupCommunicator implements Runnable {
 	
 	@Override
 	public void run() {
+		isRunning = true;
 		while(true) {
 			// Keep connecting to another group manager until connection is established
 			if(socket == null) {
@@ -95,6 +96,9 @@ public class GroupCommunicator implements Runnable {
 	}
 	
 	public void write(Object command) {
+		if(!connected) {
+			return;
+		}
 		try {
 			output.writeObject(command);
 		} catch (IOException e) {
@@ -108,10 +112,13 @@ public class GroupCommunicator implements Runnable {
 
 	public void disconnect() {
 		try {
-			socket.close();
+			if(socket != null) {
+				socket.close();
+			}
 		} catch (IOException e) {
 			// Error closing socket, continue
 		}
+		isRunning = false;
 		connected = false;
 		input = null;
 		output = null;

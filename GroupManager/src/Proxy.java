@@ -5,15 +5,17 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 
 public class Proxy {
+	private static final int proxy_client_port = 10000;
+	private static final int proxy_server_port = 5000;
+	private static final int server_port = 1; // needs to be the server's serversocket static port
 	private ServerSocket client_listener;
 	private ServerSocket server_listener;
 	private InetAddress server_address;
-	private int server_port; // Needs to be the server's serversocket port
 
-	public Proxy(int client_port, int server_port) {
+	public Proxy() {
 		try {
-			client_listener = new ServerSocket(client_port);
-			server_listener = new ServerSocket(server_port);
+			client_listener = new ServerSocket(proxy_client_port);
+			server_listener = new ServerSocket(proxy_server_port);
 		} catch (NumberFormatException e) {
 			// TODO: handle exception, for now, exit program
 			System.exit(0);
@@ -42,7 +44,6 @@ public class Proxy {
 			try {
 				Socket server = server_listener.accept();
 				server_address = server.getInetAddress();
-				//server_port = server.getPort();
 				break;
 			} catch (IOException e) {
 				// Wait for new server
@@ -51,7 +52,7 @@ public class Proxy {
 	}
 	
 	public static void main(String[] args) {
-		Proxy proxy = new Proxy(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+		Proxy proxy = new Proxy();
 		proxy.run();
 	}
 }

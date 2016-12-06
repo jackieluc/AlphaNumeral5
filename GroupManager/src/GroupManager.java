@@ -44,6 +44,7 @@ public class GroupManager {
 					Thread.sleep(timeout*5);
 					if(leader_ip == null) {
 						System.out.println("New election started");
+						election.current_leader = "";
 						election.elect(ip);
 						multicast(new ElectionCommand(ip));
 						return;
@@ -55,7 +56,10 @@ public class GroupManager {
 					while(true) {
 						Thread.sleep(timeout);
 						if(!leader.isAlive()) {
-							System.out.println("TODO: new election");
+							System.out.println("New election started");
+							election.current_leader = "";
+							election.elect(ip);
+							multicast(new ElectionCommand(ip));
 							return;
 						}
 					}
@@ -84,6 +88,9 @@ public class GroupManager {
 				comms.put(ip, gc);
 			} else {
 				gc = comms.get(ip);
+			}
+			if(gc.connected) { // Might have to be isRunning instead of connected
+				return;
 			}
 			new Thread(gc).start();
 		}
