@@ -1,3 +1,5 @@
+package networking.groupmanager;
+
 import java.io.Serializable;
 
 public abstract class GroupCommand implements Serializable {

@@ -1,15 +1,16 @@
+package networking.groupmanager;
 
-public class ConnectCommand extends GroupCommand {
+public class LeaderCommand extends GroupCommand {
 	public String ip;
 	
-	public ConnectCommand(String ip) {
+	public LeaderCommand(String ip) {
 		this.ip = ip;
 	}
-	
+
 	@Override
 	public void read() {
 		GroupManager gm = GroupManager.getInstance();
-		gm.add(ip);
+		gm.election.newLeader(ip);
 		multicast_count--;
 		if(multicast_count < 0) {
 			return;

@@ -1,3 +1,4 @@
+package networking.groupmanager;
 
 public class Election {
 	public GroupManager gm;

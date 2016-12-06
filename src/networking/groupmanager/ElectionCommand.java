@@ -1,3 +1,4 @@
+package networking.groupmanager;
 
 public class ElectionCommand extends GroupCommand {
 	public String ip;
