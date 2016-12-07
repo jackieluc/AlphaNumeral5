@@ -17,7 +17,10 @@ public class Logger
 	{
     	if(debug)
     	{
-    		System.out.println(o.toString());
+    		if(o instanceof Exception)
+    			((Exception) o).printStackTrace();
+    		else
+    			System.out.println(o.toString());
     	}
     }
 }

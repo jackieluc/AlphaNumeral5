@@ -7,7 +7,7 @@ import java.net.UnknownHostException;
 
 public class ServerMain
 {
-    private static final int PORT = 5001;
+    private static final int PORT = 4000;
    
     private static void SetupServer(String proxyIP, String aServerIP)
     {

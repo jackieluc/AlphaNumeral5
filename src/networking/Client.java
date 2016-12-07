@@ -10,7 +10,7 @@ import static debug.Logger.log;
 public class Client implements Runnable
 {
     private String proxyIP;
-    private static final int PROXYPORT = 5000;
+    private static final int PROXYPORT = 10000;
     //
     private Socket socket;
     private Serializer serializer;
