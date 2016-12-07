@@ -1,29 +1,20 @@
-/**
- * Created by Ahmed on 10/26/2016.
- */
-
-import javax.swing.*;
-
-import asciiPanel.AsciiPanel;
 import debug.Logger;
-import game.GameController;
-import game.GameRenderer;
 import game.GameState;
-import networking.Client;
 import networking.Server;
 
-import java.awt.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class ServerMain
 {
+    private static final int PORT = 5001;
    
-    private static void SetupServer(String port)
+    private static void SetupServer(String proxyIP, String aServerIP)
     {
-        Server server = new Server(Integer.parseInt(port));
+        Server server = new Server(PORT);
         Thread thread = new Thread(server);
         thread.start();
+        server.setupGroupManager(proxyIP, aServerIP);
     }
 
     public static void main(String[] args)
@@ -37,9 +28,19 @@ public class ServerMain
         // Create a new game state
         GameState.getInstance();
         Logger.debug = true;
-        int port = 5001;
-        SetupServer(port+"");
 
-     
+        //args[0] = proxy ip
+        //args[1] = the ip of a server that is in the group of servers
+        if(args.length == 1)
+            SetupServer(args[0], args[1]);
+        else if (args.length == 0)
+            SetupServer(args[0], "");
+        else
+        {
+            System.err.println("Please enter the correct format to start the server:");
+            System.err.println("1. <IP of proxy>");
+            System.err.println("2. <IP of proxy> <IP of server you are trying to connect to>");
+            System.exit(2);
+        }
     }
 }

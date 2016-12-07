@@ -2,18 +2,15 @@ package networking;
 
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
 
-import debug.Logger;
 import game.GameRenderer;
 import networking.commands.Command;
-import networking.commands.MoveCommand;
 import static debug.Logger.log;
 
 public class Client implements Runnable
 {
-	private String serverIP;
-	private int serverPort;
+    private static final String PROXYIP = "127.0.0.1";
+    private static final int PROXYPORT = 5000;
     //
     private Socket socket;
     private Serializer serializer;
@@ -103,8 +100,17 @@ public class Client implements Runnable
             return false;
         }*/
     	//System.err.println("client 101 serverPort "+ serverPort);
-        ServerList serverList = new ServerList(serverPort);
-        socket = serverList.getConnectionToMasterServer();
+//        ServerList serverList = new ServerList(serverPort);
+        Socket socket = null;
+        try
+        {
+            socket = new Socket(PROXYIP, PROXYPORT);
+        }
+        catch (IOException e)
+        {
+            //todo reconnect for a certain amount of time
+            e.printStackTrace();
+        }
        // System.err.println("returned socket in client line 103 "+socket);
         return (socket != null);
     }

@@ -1,31 +1,32 @@
 package networking;
 
+import FileIO.WriteFile;
 import debug.Logger;
 import game.GameState;
 import game.Player;
-//import networking.BackupServer.MasterServerConnection;
 import networking.commands.Command;
 import networking.commands.MoveCommand;
 import networking.commands.RegisterBackupServerCommand;
 import networking.commands.RegisterUserCommand;
+import networking.groupmanager.*;
 
 import java.io.IOException;
-import java.io.Serializable;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.*;
+import java.security.acl.Group;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import FileIO.WriteFile;
 
 import static debug.Logger.log;
 
 
 public class Server implements Runnable
 {
-	boolean backup=false;
-	 private static boolean isRunning;
+	boolean backup = false;
+    private static boolean isRunning;
 	private int port = -1;
     //
     private ServerSocket serverSocket;
@@ -183,6 +184,21 @@ public class Server implements Runnable
 		inGameClients = new HashMap<String, ClientConnection>();
 	}
 
+	public void setupGroupManager(String proxyIP, String aServerIP)
+    {
+        GroupManager gm = GroupManager.getInstance();
+
+        gm.proxy_ip = proxyIP;
+
+        //if there is an IP to connect to the group of servers
+        if(aServerIP.length() > 0)
+            gm.initialize(aServerIP);
+
+        gm.election = new Election();
+        gm.isLeaderAlive();
+        gm.run();
+    }
+
     /**
      * Sends a command to all clients
      * @param command Command to send
@@ -339,18 +355,15 @@ public class Server implements Runnable
     }
     
    /////////////////////
-    class MasterServerConnection extends Connection implements Runnable
+    private class MasterServerConnection extends Connection implements Runnable
     {
     //	private static boolean isRunning;
     	ClientConnection clientConnection;
     	Server server;
         public MasterServerConnection(Server server, Socket socket)
         {
-        	
             super(socket);
             this.server=server;
-
-       
         }
 
         @Override
@@ -370,12 +383,8 @@ public class Server implements Runnable
                 
                 if(command instanceof MoveCommand)
                 	new WriteFile(((MoveCommand) command).username).writeToDisk();
-                
-//                System.err.println("Backup Client list size "+ server.inGameClients.size());
-                //command.updateServer(server,clientConnection);
-                
             }
-            System.err.println("server crahsed");
+            System.err.println("server crashed");
 
             // close everything
             try
@@ -389,8 +398,6 @@ public class Server implements Runnable
             {
                 Logger.log("Error closing master server connection");
             }
-   
         }
     }
-    
 } // networking.Server

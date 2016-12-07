@@ -1,5 +1,8 @@
 package networking.groupmanager;
 
+import networking.groupmanager.commands.ElectionCommand;
+import networking.groupmanager.commands.LeaderCommand;
+
 public class Election {
 	public GroupManager gm;
 	public String current_leader = "";

@@ -1,15 +1,8 @@
-import javax.swing.*;
-
-import asciiPanel.AsciiPanel;
 import debug.Logger;
 import game.GameController;
 import game.GameRenderer;
 import game.GameState;
 import networking.Client;
-import networking.Server;
-
-import java.awt.*;
-
 
 public class ClientMain {
 

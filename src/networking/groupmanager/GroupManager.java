@@ -1,5 +1,7 @@
 package networking.groupmanager;
 
+import networking.groupmanager.commands.ElectionCommand;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -134,21 +136,5 @@ public class GroupManager {
 	
 	public void connectToProxy() {
 		// server.connectToProxy();
-	}
-
-	public static void main(String[] args) {
-		GroupManager gm = GroupManager.getInstance();
-		if(args.length == 1) {
-			gm.proxy_ip = args[0];
-		} else if(args.length == 2) {
-			gm.proxy_ip = args[0];
-			gm.initialize(args[1]);
-		} else {
-			System.out.println("Failed to start group manager");
-			System.exit(0);
-		}
-		gm.election = new Election();
-		gm.isLeaderAlive();
-		gm.run();
 	}
 }

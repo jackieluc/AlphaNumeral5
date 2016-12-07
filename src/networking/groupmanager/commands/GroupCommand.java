@@ -1,4 +1,4 @@
-package networking.groupmanager;
+package networking.groupmanager.commands;
 
 import java.io.Serializable;
 

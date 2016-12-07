@@ -1,4 +1,6 @@
-package networking.groupmanager;
+package networking.groupmanager.commands;
+
+import networking.groupmanager.GroupManager;
 
 public class LeaderCommand extends GroupCommand {
 	public String ip;
