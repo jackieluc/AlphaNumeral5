@@ -205,12 +205,27 @@ public class Server implements Runnable
 
     public void makePrimary(String proxyIP)
     {
+        Socket socket = null;
         try {
-            proxySocket = new Socket(proxyIP, PROXYPORT);
+            socket = new Socket(proxyIP, PROXYPORT);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+//        while (true)
+//        {
+//            log("Waiting for connection...");
+//            try{
+                ClientConnection clientConnection = new ClientConnection(this, socket);
+                Thread connectToProxy = new Thread(clientConnection);
+                connectToProxy.start();
+//                executorService.submit(clientConnection);
+//            }catch (Exception ex)
+//            {
+//                log("Error in server loop!");
+//                log(ex);
+//            }
+//        }
     }
 
     public void makeBackup()
