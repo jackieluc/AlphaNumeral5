@@ -11,15 +11,10 @@ public class ClientTest {
 	
 	public ClientTest(String ip) {
 		try {
-			System.out.println("1");
 			socket = new Socket(ip, 10000);
-			System.out.println("2");
 			output = new ObjectOutputStream(socket.getOutputStream());
-			System.out.println("3");
 			output.flush();
-			System.out.println("4");
 			input = new ObjectInputStream(socket.getInputStream());
-			System.out.println("5");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -39,11 +34,11 @@ public class ClientTest {
 						output.writeObject(new ClientTestCommand());
 						Thread.sleep(1000);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					}
 				}
 			}
@@ -59,14 +54,14 @@ public class ClientTest {
 						System.out.println(object.toString());
 						Thread.sleep(1000);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					}
 				}
 			}

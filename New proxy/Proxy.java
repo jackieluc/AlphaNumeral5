@@ -18,8 +18,8 @@ public class Proxy {
 		try {
 			client_listener = new ServerSocket(proxy_client_port);
 			server_listener = new ServerSocket(proxy_server_port);
-			System.out.println("Server connection: " + server_listener.getInetAddress().getLocalHost().getHostAddress() + ":" + proxy_server_port);
-			System.out.println("Client connection: " + client_listener.getInetAddress().getLocalHost().getHostAddress() + ":" + proxy_client_port);
+			System.out.println("Server connection: " + InetAddress.getLocalHost().getHostAddress() + ":" + proxy_server_port);
+			System.out.println("Client connection: " + InetAddress.getLocalHost().getHostAddress() + ":" + proxy_client_port);
 		} catch (NumberFormatException e) {
 			// TODO: handle exception, for now, exit program
 			System.exit(0);
@@ -85,6 +85,13 @@ public class Proxy {
 				} catch (ClassNotFoundException e) {
 					System.err.println("Invalid command object");
 				}
+				try {
+					server.close();
+					client.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}).start();
 		
@@ -112,6 +119,13 @@ public class Proxy {
 					System.err.println("Server to client failed");
 				} catch (ClassNotFoundException e) {
 					System.err.println("Invalid command object");
+				}
+				try {
+					server.close();
+					client.close();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 			}
 		}).start();

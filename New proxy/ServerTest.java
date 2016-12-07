@@ -13,21 +13,13 @@ public class ServerTest {
 	
 	public ServerTest(String ip) {
 		try {
-			System.out.println("1");
 			Socket temp = new Socket(ip, 5000);
-			System.out.println("2");
 			temp.close();
-			System.out.println("3");
 			server = new ServerSocket(4000);
-			System.out.println("4");
 			socket = server.accept();
-			System.out.println("5");
 			output = new ObjectOutputStream(socket.getOutputStream());
-			System.out.println("6");
 			output.flush();
-			System.out.println("7");
 			input = new ObjectInputStream(socket.getInputStream());
-			System.out.println("8");
 		} catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -47,11 +39,11 @@ public class ServerTest {
 						output.writeObject(new ServerTestCommand());
 						Thread.sleep(1000);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					}
 				}
 			}
@@ -67,14 +59,14 @@ public class ServerTest {
 						System.out.println(object.toString());
 						Thread.sleep(1000);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					} catch (ClassNotFoundException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						System.out.println("Disconnected");
+						break;
 					}
 				}
 			}
