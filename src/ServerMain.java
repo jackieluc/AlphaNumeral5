@@ -19,27 +19,27 @@ import java.net.UnknownHostException;
 public class ServerMain
 {
    
-    private static void SetupServer(String port)
+    private static void SetupServer(int port)
     {
-        Server server = new Server(Integer.parseInt(port));
+        Server server = new Server(port);
         Thread thread = new Thread(server);
         thread.start();
     }
 
     public static void main(String[] args)
     {
-    	try {
-			System.err.println("connect to "+ InetAddress.getLocalHost().getHostAddress());
-		} catch (UnknownHostException e) {
+    	try
+        {
+			System.err.println("Connect to " + InetAddress.getLocalHost().getHostAddress());
+		}
+		catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
         // Create a new game state
         GameState.getInstance();
         Logger.debug = true;
-        int port = 5001;
-        SetupServer(port+"");
-
-     
+        int port = Integer.parseInt(args[0]);
+        SetupServer(port);
     }
 }

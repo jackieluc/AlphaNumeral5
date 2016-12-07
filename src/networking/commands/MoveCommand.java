@@ -1,13 +1,12 @@
 package networking.commands;
 
-import FileIO.WriteFile;
-import debug.Logger;
 import game.GameRenderer;
 import game.GameState;
-import game.Map;
 import game.Player;
 import networking.Client;
 import networking.Server;
+
+import static debug.Logger.log;
 
 /**
  * Created by Ahmed on 11/7/2016.
@@ -33,30 +32,34 @@ public class MoveCommand extends Command
     @Override
     public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
-        // TODO only send to close by players
-//    	Logger.log("Writing to disk...");
-//    	new WriteFile(username).writeToDisk();
+        clientConnection.username = this.username;
     	server.backup(this);
         server.sendAll(this);
     }
 
+    /**
+     * Update the state of the game - update player's position
+     */
     @Override
     public void updateState()
     {
         synchronized (GameState.current)
         {
+            // Grab the player from the game state
             Player player = GameState.current.players.get(username);
 
+            // If player doesn't exist
             if (player == null)
             {
                 player = new Player(username);
                 GameState.current.players.put(username, player);
-                Logger.log("Created new player " + username);
+                log("Created new player " + username);
             }
 
+            // Update player's position
             player.x = x;
             player.y = y;
-            Logger.log("Updating state: " + player.username + " is @ (" + player.x + ", " + player.y + ")");
+            log("Updating state: " + player.username + " is @ (" + player.x + ", " + player.y + ")");
         }
     }
 

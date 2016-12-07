@@ -74,7 +74,6 @@ public class RegisterUserCommand extends Command
                     updatePlayer(server, username);
                     Logger.log("Welcome back " + username + "!");
                 }
-                // create a new user
                 else
                 {
                     // create player on the map
@@ -142,9 +141,6 @@ public class RegisterUserCommand extends Command
         {
             // Ask for new username
             Scanner scanner = new Scanner(System.in);
-
-//            if (username != null)
-//                System.out.println("User \"" + username + "\" already exists!");
 
             System.out.print("Enter new username:");
             username = scanner.next();

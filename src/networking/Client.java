@@ -15,17 +15,11 @@ public class Client implements Runnable
     private Socket socket;
     private Serializer serializer;
     public String username;
-    private boolean reconnected;
 	
 	public Client()
 	{
         username = null;
 	}
-
-	public boolean isConnected()
-    {
-        return (username != null);
-    }
 
 	public void stop()
     {
@@ -48,12 +42,11 @@ public class Client implements Runnable
     {
         // Will try to reconnect indefinitely
         // TODO: timeout client if cannot connect
-        while(true) {
-            reconnected = true;
+        while(true)
+        {
             // If can't connect, wait for a certain delay
             if (!connect())
             {
-                reconnected = false;
                 // Poll delay of 2 seconds
                 try {
                     Thread.sleep(2000);
@@ -63,14 +56,8 @@ public class Client implements Runnable
 
                 log("Disconnected from server... trying to reconnect...");
             }
-            else {
-                if (reconnected) {
-                    try {
-                        System.out.println("Reconnected to: " + socket.getInetAddress().getLocalHost().getHostAddress() + ":" + serverPort);
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    }
-                }
+            else
+            {
                 // Create a serializer for this socket
                 serializer = new Serializer(socket);
 
@@ -78,14 +65,12 @@ public class Client implements Runnable
 
                 // Loop and wait for packets
                 Command command;
-                while ((command = (Command) serializer.readFromSocket()) != null) {
-                    //
-                    if (command != null) {
-                        log("Command recieved of type " + command);
+                while ((command = (Command) serializer.readFromSocket()) != null)
+                {
+                    log("Command received of type " + command.getClass().toString());
 
-                        command.updateState();
-                        command.updateClient(this);
-                    }
+                    command.updateState();
+                    command.updateClient(this);
                 }
             }
         }
@@ -110,8 +95,11 @@ public class Client implements Runnable
     {
         try
         {
-            if (socket != null) socket.close();
-            if (GameRenderer.current != null) GameRenderer.current.close();
+            if (socket != null)
+                socket.close();
+
+            if (GameRenderer.current != null)
+                GameRenderer.current.close();
         }
         catch (Exception ex)
         {
