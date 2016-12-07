@@ -20,7 +20,7 @@ import static game.GameState.current;
 public class RegisterUserCommand extends Command
 {
     public String username;
-    private boolean registrationSuccessful;
+    private boolean registrationSuccessful = false;
 
     public RegisterUserCommand(String username)
     {
@@ -138,7 +138,7 @@ public class RegisterUserCommand extends Command
             // Log
             Logger.log("Joined game with username " + username + "!");
         }
-        else
+        else if (username == null)
         {
             // Ask for new username
             Scanner scanner = new Scanner(System.in);

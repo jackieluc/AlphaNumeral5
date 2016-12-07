@@ -1,24 +1,21 @@
 package networking;
 
-import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
+import java.net.UnknownHostException;
 
-import debug.Logger;
 import game.GameRenderer;
 import networking.commands.Command;
-import networking.commands.MoveCommand;
+import networking.commands.RegisterUserCommand;
+
 import static debug.Logger.log;
 
 public class Client implements Runnable
 {
-	private String serverIP;
-	private int serverPort;
-    //
+    private int serverPort;
     private Socket socket;
     private Serializer serializer;
-    //
     public String username;
+    private boolean reconnected;
 	
 	public Client()
 	{
@@ -49,40 +46,49 @@ public class Client implements Runnable
     @Override
     public void run()
     {
-        // If can't connect, close and quit program
-        if (!connect())
-        {
-            close();
-            return;
-        }
-
-        // Create a serializer for this socket
-        serializer = new Serializer(socket);
-
-        // Loop and wait for packets
-        Command command;
-        while ((command = (Command) serializer.readFromSocket()) != null)
-        {
-            //
-            if (command != null)
+        // Will try to reconnect indefinitely
+        // TODO: timeout client if cannot connect
+        while(true) {
+            reconnected = true;
+            // If can't connect, wait for a certain delay
+            if (!connect())
             {
-                log("Command recieved of type " + command);
+                reconnected = false;
+                // Poll delay of 2 seconds
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-                command.updateState();
-                command.updateClient(this);
+                log("Disconnected from server... trying to reconnect...");
+            }
+            else {
+                if (reconnected) {
+                    try {
+                        System.out.println("Reconnected to: " + socket.getInetAddress().getLocalHost().getHostAddress() + ":" + serverPort);
+                    } catch (UnknownHostException e) {
+                        e.printStackTrace();
+                    }
+                }
+                // Create a serializer for this socket
+                serializer = new Serializer(socket);
+
+                new RegisterUserCommand(username).updateClient(this);
+
+                // Loop and wait for packets
+                Command command;
+                while ((command = (Command) serializer.readFromSocket()) != null) {
+                    //
+                    if (command != null) {
+                        log("Command recieved of type " + command);
+
+                        command.updateState();
+                        command.updateClient(this);
+                    }
+                }
             }
         }
-        try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-        run();
-        // TODO try to reconnect
-        log("Disconnected from server...");
-
-        // Close
-        close();
     }
 
     /**
@@ -91,21 +97,9 @@ public class Client implements Runnable
      */
     private boolean connect()
     {
-        /*try
-        {
-            socket = new Socket(serverIP, serverPort);
-            return true;
-        }
-        catch (IOException ex)
-        {
-            log("Error connecting to server");
-            log(ex);
-            return false;
-        }*/
-    	//System.err.println("client 101 serverPort "+ serverPort);
+        // Get the primary server to connect to from the list of servers
         ServerList serverList = new ServerList(serverPort);
         socket = serverList.getConnectionToMasterServer();
-       // System.err.println("returned socket in client line 103 "+socket);
         return (socket != null);
     }
 

@@ -73,7 +73,7 @@ public class Server implements Runnable
 
 			//System.err.println("backup>> "+ backup);
 			// Tell the user to register (no commands will be accepted until successful registration)
-			serializer.writeToSocket(new RegisterUserCommand(null));
+//			serializer.writeToSocket(new RegisterUserCommand(null));
 
 			// Wait for commands from client
 			while ((command = (Command) serializer.readFromSocket()) != null)
