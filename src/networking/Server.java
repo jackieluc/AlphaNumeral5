@@ -40,7 +40,7 @@ public class Server implements Runnable
     public ArrayList<BackupServerConnection> backupServers;
 
     /**
-     * Manages a client (Listens on another thread, sends commands)
+     * Manages a client (Listens on another thread, sends groupCommands)
      */
 	public class ClientConnection extends Connection implements Runnable
 	{
@@ -73,10 +73,10 @@ public class Server implements Runnable
 			Command command;
 
 			//System.err.println("backup>> "+ backup);
-			// Tell the user to register (no commands will be accepted until successful registration)
+			// Tell the user to register (no groupCommands will be accepted until successful registration)
 			serializer.writeToSocket(new RegisterUserCommand(null));
 
-			// Wait for commands from client
+			// Wait for groupCommands from client
 			while ((command = (Command) serializer.readFromSocket()) != null)
 			{
 				
@@ -373,7 +373,7 @@ public class Server implements Runnable
             
             serializer.writeToSocket(new RegisterBackupServerCommand());
 
-            // Wait for commands from client
+            // Wait for groupCommands from client
             while ((command = (Command) serializer.readFromSocket()) != null)
             {
                 //

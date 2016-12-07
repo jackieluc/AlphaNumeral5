@@ -1,6 +1,6 @@
 package networking.groupmanager;
 
-import networking.groupmanager.commands.ElectionCommand;
+import networking.groupmanager.groupCommands.ElectionCommand;
 
 import java.io.IOException;
 import java.net.InetAddress;

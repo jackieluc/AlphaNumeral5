@@ -9,7 +9,7 @@ import static debug.Logger.log;
 
 public class Client implements Runnable
 {
-    private static final String PROXYIP = "127.0.0.1";
+    private String proxyIP;
     private static final int PROXYPORT = 5000;
     //
     private Socket socket;
@@ -17,9 +17,10 @@ public class Client implements Runnable
     //
     public String username;
 	
-	public Client()
+	public Client(String proxyIP)
 	{
-        username = null;
+        this.username = null;
+        this.proxyIP = proxyIP;
 	}
 
 	public boolean isConnected()
@@ -101,10 +102,12 @@ public class Client implements Runnable
         }*/
     	//System.err.println("client 101 serverPort "+ serverPort);
 //        ServerList serverList = new ServerList(serverPort);
+
+        //connect to the proxy
         Socket socket = null;
         try
         {
-            socket = new Socket(PROXYIP, PROXYPORT);
+            socket = new Socket(proxyIP, PROXYPORT);
         }
         catch (IOException e)
         {

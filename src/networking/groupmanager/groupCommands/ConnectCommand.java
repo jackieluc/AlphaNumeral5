@@ -1,4 +1,4 @@
-package networking.groupmanager.commands;
+package networking.groupmanager.groupCommands;
 
 import networking.groupmanager.GroupManager;
 

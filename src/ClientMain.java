@@ -6,9 +6,8 @@ import networking.Client;
 
 public class ClientMain {
 
-	private static void SetupClient()
+	private static void SetupClient(String proxyIP)
     {
-    	
         Thread thread;
 
         // Create the renderer and run on thread
@@ -17,7 +16,7 @@ public class ClientMain {
         thread.start();
 
         // Create client and run on thread
-        Client client = new Client();
+        Client client = new Client(proxyIP);
         thread = new Thread(client, "Client");
         thread.start();
 
@@ -27,10 +26,11 @@ public class ClientMain {
     }
 	public static void main(String[] args) {
 		   // Create a new game state
-		Logger.debug=true;
+		Logger.debug = true;
         GameState.getInstance();
-		SetupClient();
 
+        //args[0] = IP of the proxy
+		SetupClient(args[0]);
 	}
 
 }

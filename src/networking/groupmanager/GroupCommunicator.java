@@ -1,7 +1,7 @@
 package networking.groupmanager;
 
-import networking.groupmanager.commands.ConnectCommand;
-import networking.groupmanager.commands.GroupCommand;
+import networking.groupmanager.groupCommands.ConnectCommand;
+import networking.groupmanager.groupCommands.GroupCommand;
 
 import java.io.EOFException;
 import java.io.IOException;

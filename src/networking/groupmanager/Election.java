@@ -1,12 +1,11 @@
 package networking.groupmanager;
 
-import networking.groupmanager.commands.ElectionCommand;
-import networking.groupmanager.commands.LeaderCommand;
+import networking.groupmanager.groupCommands.ElectionCommand;
+import networking.groupmanager.groupCommands.LeaderCommand;
 
 public class Election {
 	public GroupManager gm;
 	public String current_leader = "";
-	//public long time = 5000;
 	public Thread leader;
 	public Object electionLock = new Object();
 	public boolean newLeaderFound = false;
@@ -14,8 +13,8 @@ public class Election {
 	public Election() {
 		gm = GroupManager.getInstance();
 	}
-	
-	public void waitForLeader(long time) {
+
+	public void waitForLeader(final long time) {
 		leader = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -30,7 +29,6 @@ public class Election {
 						System.out.println("No leader found, restart election");
 						restart();
 					}
-					return;
 				} catch (InterruptedException e) {
 					// New current leader or new leader found
 				}
@@ -63,7 +61,7 @@ public class Election {
 			return current_leader;
 		}
 	}
-	
+
 	public void restart() {
 		synchronized(electionLock) {
 			current_leader = "";
