@@ -22,9 +22,9 @@ public class Election {
 					Thread.sleep(time);
 					if(current_leader.equals(gm.ip)) {
 						System.out.println("I'm leader");
-						gm.leader_ip = gm.ip;
+						gm.leaderIP = gm.ip;
 						gm.multicast(new LeaderCommand(gm.ip));
-						gm.connectToProxy();
+						gm.makePrimary();
 					} else {
 						System.out.println("No leader found, restart election");
 						restart();
@@ -83,8 +83,9 @@ public class Election {
 				leader.interrupt();
 			}
 			System.out.println("New leader: " + ip);
-			gm.leader_ip = ip;
+			gm.leaderIP = ip;
 			gm.isLeaderAlive();
+			gm.makeBackup();
 		}
 	}
 }

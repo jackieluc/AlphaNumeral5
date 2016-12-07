@@ -1,5 +1,6 @@
 package networking.groupmanager;
 
+import networking.Server;
 import networking.groupmanager.groupCommands.ElectionCommand;
 
 import java.io.IOException;
@@ -17,10 +18,10 @@ public class GroupManager {
 	public ServerSocket socket;
 	public String ip;
 	public Election election;
-	public String leader_ip;
-	public String proxy_ip;
+	public String leaderIP;
+	public String proxyIP;
 	public Thread isLeaderAlive;
-	//public Server server;
+	public Server server;
 	
 	public static GroupManager getInstance() {
 		return instance;
@@ -46,7 +47,7 @@ public class GroupManager {
 				try {
 					// Wait for connections to be made first
 					Thread.sleep(timeout*5);
-					if(leader_ip == null) {
+					if(leaderIP == null) {
 						System.out.println("New election started");
 						election.current_leader = "";
 						election.elect(ip);
@@ -55,7 +56,7 @@ public class GroupManager {
 					}
 					GroupCommunicator leader;
 					synchronized(hashLock) {
-						leader = comms.get(leader_ip);
+						leader = comms.get(leaderIP);
 					}
 					while(true) {
 						Thread.sleep(timeout);
@@ -133,8 +134,23 @@ public class GroupManager {
 			}
 		}
 	}
-	
-	public void connectToProxy() {
-		// server.connectToProxy();
+
+	public void attachServer(Server server)
+	{
+		this.server = server;
 	}
+
+	public void makePrimary()
+	{
+		server.makePrimary(proxyIP);
+	}
+
+	public void makeBackup()
+	{
+		server.makeBackup();
+	}
+	
+//	public void connectToProxy() {
+//		// server.connectToProxy();
+//	}
 }

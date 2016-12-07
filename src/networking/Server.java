@@ -11,6 +11,7 @@ import networking.commands.RegisterUserCommand;
 import networking.groupmanager.*;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -38,6 +39,8 @@ public class Server implements Runnable
     public ArrayList<ClientConnection> clients;
     //
     public ArrayList<BackupServerConnection> backupServers;
+    private Socket proxySocket;
+    private final static int PROXYPORT = 5000;
 
     /**
      * Manages a client (Listens on another thread, sends groupCommands)
@@ -187,8 +190,9 @@ public class Server implements Runnable
 	public void setupGroupManager(String proxyIP, String aServerIP)
     {
         GroupManager gm = GroupManager.getInstance();
+        gm.server = this;
 
-        gm.proxy_ip = proxyIP;
+        gm.proxyIP = proxyIP;
 
         //if there is an IP to connect to the group of servers
         if(aServerIP.length() > 0)
@@ -199,6 +203,20 @@ public class Server implements Runnable
         gm.run();
     }
 
+    public void makePrimary(String proxyIP)
+    {
+        try {
+            proxySocket = new Socket(proxyIP, PROXYPORT);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void makeBackup()
+    {
+
+    }
     /**
      * Sends a command to all clients
      * @param command Command to send
@@ -260,9 +278,9 @@ public class Server implements Runnable
 	public void run()
 	{
 		connectToMaster();
-		
+
     } // run
-	
+
 	 /**
      * Connect to the master server
      */
@@ -280,9 +298,9 @@ public class Server implements Runnable
         	backup=true;
         	//log(" **** primary found at "+ socket + "****"
         	//		+ "****starting server as a backup ****");
-        	// connection.send(new RegisterBackupServerCommand());     	        	
+        	// connection.send(new RegisterBackupServerCommand());
        /**  if (serverSocket != null)
-			{       		
+			{
 				while (true)
 				{
 					log("backup Waiting for connection...");
@@ -298,9 +316,9 @@ public class Server implements Runnable
 					}
 				}
 			}**/
-			
+
         	//executorService = Executors.newCachedThreadPool();
-        	//serverSocket = createServerSocket();   	
+        	//serverSocket = createServerSocket();
         	backup=true;
         	//ClientConnection clientConnection = null;
         	log(" **** primary found at "+ socket + "****"
@@ -310,10 +328,10 @@ public class Server implements Runnable
             Thread thread = new Thread(connection);
             thread.start();
         }
-        
-        
-        
- 
+
+
+
+
        ///////////////
         else{
         	log("**** no primary found, starting server as primary ****");
@@ -321,7 +339,7 @@ public class Server implements Runnable
         	serverSocket = createServerSocket();
         	if (serverSocket != null)
 			{
-				
+
 				while (true)
 				{
 					log("Waiting for connection...");
@@ -337,10 +355,10 @@ public class Server implements Runnable
 			}
 
         }
-    
+
     }
-    
-    
+
+
     // Sends a 0 to connected clients to signify that this is a backup
     void sendBackupSignal(Socket clientSocket)
     {
@@ -353,7 +371,7 @@ public class Server implements Runnable
             log("Error sending Master signal");
         }
     }
-    
+
    /////////////////////
     private class MasterServerConnection extends Connection implements Runnable
     {
@@ -370,7 +388,7 @@ public class Server implements Runnable
         public void run()
         {
             Command command;
-            
+
             serializer.writeToSocket(new RegisterBackupServerCommand());
 
             // Wait for groupCommands from client
@@ -380,7 +398,7 @@ public class Server implements Runnable
                 log("Command recieved from Master Server of type " + command);
                 //
                 command.updateState();
-                
+
                 if(command instanceof MoveCommand)
                 	new WriteFile(((MoveCommand) command).username).writeToDisk();
             }

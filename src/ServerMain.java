@@ -12,8 +12,8 @@ public class ServerMain
     private static void SetupServer(String proxyIP, String aServerIP)
     {
         Server server = new Server(PORT);
-        Thread thread = new Thread(server);
-        thread.start();
+//        Thread thread = new Thread(server);
+//        thread.start();
         server.setupGroupManager(proxyIP, aServerIP);
     }
 
@@ -31,9 +31,9 @@ public class ServerMain
 
         //args[0] = proxy ip
         //args[1] = the ip of a server that is in the group of servers
-        if(args.length == 1)
+        if(args.length == 2)
             SetupServer(args[0], args[1]);
-        else if (args.length == 0)
+        else if (args.length == 1)
             SetupServer(args[0], "");
         else
         {
