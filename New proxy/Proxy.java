@@ -1,6 +1,4 @@
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -28,7 +26,7 @@ public class Proxy {
 			System.exit(0);
 		}
 	}
-	
+
 	public void run() {
 		// Wait for server to connect first
 		waitForServer();
@@ -57,80 +55,13 @@ public class Proxy {
 			}
 		}
 	}
-	
+
 	private void connect(Socket client, Socket server) {
 		System.out.println("Connecting client " + client.getInetAddress().toString() + " to server " + server.getInetAddress().toString());
-		// Client to server
-		new Thread(new Runnable(){
-			@Override
-			public void run() {
-				try {
-					String server_address = server.getInetAddress().toString();
-					String client_address = server.getInetAddress().toString();
-					ObjectOutputStream to_server = new ObjectOutputStream(server.getOutputStream());
-					to_server.flush();
-					ObjectInputStream from_client = new ObjectInputStream(client.getInputStream());
-					Object command;
-					while(true) {
-						// Get command from client
-						command = from_client.readObject();
-						System.out.println("server: " + server_address + "    client: " + client_address + "    command: " + command.toString());
-						
-						// Send command to server
-						to_server.writeObject(command);
-						to_server.flush();
-					}
-				} catch (IOException e) {
-					System.err.println("Client to server failed");
-				} catch (ClassNotFoundException e) {
-					System.err.println("Invalid command object");
-				}
-				try {
-					server.close();
-					client.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}).start();
-		
-		// Server to client
-		new Thread(new Runnable(){
-			@Override
-			public void run() {
-				try {
-					String server_address = server.getInetAddress().toString();
-					String client_address = server.getInetAddress().toString();
-					ObjectOutputStream to_client = new ObjectOutputStream(client.getOutputStream());
-					to_client.flush();
-					ObjectInputStream from_server = new ObjectInputStream(server.getInputStream());
-					Object command;
-					while(true) {
-						// Get command from client
-						command = from_server.readObject();
-						System.out.println("server: " + server_address + "    client: " + client_address + "    command: " + command.toString());
-							
-						// Send command to server
-						to_client.writeObject(command);
-						to_client.flush();
-					}
-				} catch (IOException e) {
-					System.err.println("Server to client failed");
-				} catch (ClassNotFoundException e) {
-					System.err.println("Invalid command object");
-				}
-				try {
-					server.close();
-					client.close();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		}).start();
+		new Thread(new ProxyThread(client, server)).start();
+		new Thread(new ProxyThread(server, client)).start();
 	}
-	
+
 	public static void main(String[] args) {
 		Proxy proxy = new Proxy();
 		proxy.run();
