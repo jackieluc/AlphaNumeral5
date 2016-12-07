@@ -8,9 +8,6 @@ import networking.Server;
 
 import static debug.Logger.log;
 
-/**
- * Created by Ahmed on 11/7/2016.
- */
 public class MoveCommand extends Command
 {
     public final String username;

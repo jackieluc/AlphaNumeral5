@@ -1,24 +1,12 @@
-/**
- * Created by Ahmed on 10/26/2016.
- */
-
-import javax.swing.*;
-
-import asciiPanel.AsciiPanel;
 import debug.Logger;
-import game.GameController;
-import game.GameRenderer;
 import game.GameState;
-import networking.Client;
 import networking.Server;
 
-import java.awt.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class ServerMain
 {
-   
     private static void SetupServer(int port)
     {
         Server server = new Server(port);
@@ -30,7 +18,7 @@ public class ServerMain
     {
     	try
         {
-			System.err.println("Connect to " + InetAddress.getLocalHost().getHostAddress());
+			System.err.println("Connect to: " + InetAddress.getLocalHost().getHostAddress() + ":" + args[0]);
 		}
 		catch (UnknownHostException e) {
 			// TODO Auto-generated catch block
@@ -39,6 +27,8 @@ public class ServerMain
         // Create a new game state
         GameState.getInstance();
         Logger.debug = true;
+
+        // Port is entered into the program arguments
         int port = Integer.parseInt(args[0]);
         SetupServer(port);
     }

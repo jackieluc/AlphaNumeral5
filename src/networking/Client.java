@@ -48,7 +48,8 @@ public class Client implements Runnable
             if (!connect())
             {
                 // Poll delay of 2 seconds
-                try {
+                try
+                {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -5,9 +5,6 @@ import networking.Server;
 
 import java.io.Serializable;
 
-/**
- * Created by Ahmed on 11/7/2016.
- */
 public abstract class Command implements Serializable
 {
     /**
@@ -21,9 +18,8 @@ public abstract class Command implements Serializable
 
     /**
      * Updates the game state (both client and server
-     * @param string 
      */
-    public void updateState( ){}
+    public void updateState(){}
 
     /**
      * Updates the client

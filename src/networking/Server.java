@@ -20,20 +20,19 @@ import static debug.Logger.log;
 
 public class Server implements Runnable
 {
-	private boolean backup = false;
     private int port = -1;
     private ServerSocket serverSocket;
 
     private ExecutorService executorService;
 
     // All clients in game, key is username
-	public HashMap<String,ClientConnection> inGameClients;
+	private HashMap<String,ClientConnection> inGameClients;
 
 	// List of players
-    public ArrayList<ClientConnection> clients;
+    private ArrayList<ClientConnection> clients;
 
     // List of backup servers
-    public ArrayList<BackupServerConnection> backupServers;
+    private ArrayList<BackupServerConnection> backupServers;
 
     /**
      * Manages a client (Listens on another thread, sends commands)
@@ -181,6 +180,21 @@ public class Server implements Runnable
 		inGameClients = new HashMap<String, ClientConnection>();
 	}
 
+	public HashMap<String,ClientConnection> getInGameClients()
+    {
+        return inGameClients;
+    }
+
+    public ArrayList<ClientConnection> getClients()
+    {
+        return getClients();
+    }
+
+    public ArrayList<BackupServerConnection> getBackupServers()
+    {
+        return backupServers;
+    }
+
     /**
      * Sends a command to all clients
      * @param command Command to send
@@ -196,19 +210,6 @@ public class Server implements Runnable
         for (Connection connection : backupServers)
             connection.send(command);
     }
-
-//    private void sendSerialized(ArrayList<? extends Connection> list, byte[] bytes)
-//    {
-//        try
-//        {
-//            for (Connection connection : list)
-//                connection.sendSerialized(bytes);
-//        }
-//        catch (IOException ex)
-//        {
-//            Logger.log("Error sending to all!");
-//        }
-//    }
 
     /**
      * Creates a server socket
@@ -248,8 +249,6 @@ public class Server implements Runnable
 
         if (socket != null)
         {
-        	backup = true;
-
         	log("**** Primary server found ****");
             log("**** Starting server as a backup ****");
 
@@ -283,19 +282,6 @@ public class Server implements Runnable
 			}
         }
     }
-
-//    // Sends a 0 to connected clients to signify that this is a backup
-//    public void sendBackupSignal(Socket clientSocket)
-//    {
-//        try
-//        {
-//            clientSocket.getOutputStream().write(0);
-//        }
-//        catch (IOException ex)
-//        {
-//            log("Error sending Backup signal");
-//        }
-//    }
 
     private class MasterServerConnection extends Connection implements Runnable
     {

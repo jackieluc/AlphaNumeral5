@@ -30,10 +30,10 @@ public class RegisterUserCommand extends Command
     @Override
     public void updateServer(Server server, Server.ClientConnection clientConnection)
     {
-        synchronized (server.inGameClients)
+        synchronized (server.getInGameClients())
         {
             // Check if the username exists
-            registrationSuccessful = (server.inGameClients.get(username) == null);
+            registrationSuccessful = (server.getInGameClients().get(username) == null);
 
             // Reply to client with success or not
             clientConnection.send(this);
@@ -42,7 +42,7 @@ public class RegisterUserCommand extends Command
             if (registrationSuccessful)
             {
                 // add to dictionary of in-game clients
-                server.inGameClients.put(username, clientConnection);
+                server.getInGameClients().put(username, clientConnection);
                 // Set clientConnection username
                 clientConnection.username = username;
 
@@ -80,7 +80,6 @@ public class RegisterUserCommand extends Command
                 	createPlayer(server, username);
                 	Logger.log("New user: " + username + ", joined the game!");
                 }
-                
                 getExistingPlayers(clientConnection);
             }
         }

@@ -3,7 +3,7 @@ package game;
 import java.awt.event.KeyEvent;
 
 public class CheckValid {
-	Map map;
+	private Map map;
 	public static int width;
 	public static int height;
 	

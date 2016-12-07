@@ -1,32 +1,28 @@
 package networking;
 
-import debug.Logger;
-
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-/**
- * Created by Ahmed on 11/14/2016.
- */
+import static debug.Logger.log;
+
 public class ServerList
 {
     private ArrayList<InetSocketAddress> serverAddresses;
-    int port;
+    private int port;
 
     public ServerList(int port)
     {
         serverAddresses = new ArrayList<>();
         load();
-        this.port=port;
+        this.port = port;
     }
 
     private void load()
     {
         try
         {
-        	//System.out.println(">>>>>trying to open serverFile ");
             Scanner sc = new Scanner(getClass().getClassLoader().getResource("serverlist.txt").openStream());
 
             String line;
@@ -34,15 +30,12 @@ public class ServerList
             {
                 line = sc.next();
 
-               // System.out.println(">>>>>ServerList "+ line);
                 String ip[] = line.split(":");
                 serverAddresses.add(new InetSocketAddress(ip[0], Integer.parseInt(ip[1])));
             }
-
         }
         catch (IOException ex)
         {
-
         }
     }
 
@@ -50,22 +43,15 @@ public class ServerList
     {
         Socket socket;
 
-        
         for (InetSocketAddress address : serverAddresses)
         {
-        	//System.err.println("inside master ");
-           // Logger.log("Trying to connect to " + address);
-
             if ((socket = connect(address)) != null )
             {
-                Logger.log("Connected to " + address);
+                log("Connected to " + address);
 
-                // If is master server, return socket
+                // If is master server, return the socket
                 if (isMasterServer(socket))
-                {
-                  //  Logger.log(address + " is master server");
                     return socket;
-                }
 
                 close(socket);
             }
@@ -85,7 +71,8 @@ public class ServerList
         }
         catch (IOException ex)
         {
-            Logger.log("Failed to connect to " + address);
+            log("Failed to connect to " + address);
+            log(ex);
         }
 
         return null;
@@ -96,12 +83,12 @@ public class ServerList
         try
         {
             int serverStatus = socket.getInputStream().read();
-           // Logger.log("got " + serverStatus);
             return (serverStatus == 1);
         }
         catch (IOException ex)
         {
-            Logger.log("Error checking status of connection!");
+            log("Error checking status of connection!");
+            log(ex);
         }
 
         return false;
@@ -113,9 +100,10 @@ public class ServerList
         {
             socket.close();
         }
-        catch (IOException e)
+        catch (IOException ex)
         {
-           Logger.log("Could not close socket");
+           log("Could not close socket");
+           log(ex);
         }
     }
 }

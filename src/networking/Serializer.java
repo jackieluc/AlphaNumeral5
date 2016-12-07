@@ -1,23 +1,18 @@
 package networking;
 
-import debug.Logger;
-import networking.commands.WelcomeCommand;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-/**
- * Created by Ahmed on 11/7/2016.
- */
+import static debug.Logger.log;
+
 public class Serializer
 {
     private ObjectInputStream in;
     private ObjectOutputStream out;
 
-    //
     private static ByteArrayOutputStream bout;
     private static ObjectOutputStream oout;
 
@@ -28,13 +23,13 @@ public class Serializer
             bout = new ByteArrayOutputStream();
             oout = new ObjectOutputStream(bout);
 
-            oout.writeObject(new WelcomeCommand());
             oout.flush();
             bout.toByteArray();
         }
         catch (IOException ex)
         {
-            Logger.log("Error creating static serializer!");
+            log("Error creating static serializer!");
+            log(ex);
         }
     }
 
@@ -48,30 +43,9 @@ public class Serializer
         }
         catch (IOException ex)
         {
-            Logger.log("Error creating serializer streams!");
-            Logger.log(ex);
+            log("Error creating serializer streams!");
+            log(ex);
         }
-    }
-
-    /**
-     * Serializes an object to a byte array
-     * @param obj
-     * @return
-     */
-    public static byte[] serialize(Object obj)
-    {
-        try
-        {
-            oout.writeObject(obj);
-            oout.flush();
-            return bout.toByteArray();
-        }
-        catch (IOException ex)
-        {
-            Logger.log("Error serializing with static serializer");
-        }
-
-        return null;
     }
 
     public Object readFromSocket()
@@ -82,8 +56,8 @@ public class Serializer
         }
         catch (Exception ex)
         {
-            Logger.log("Error reading object from socket!");
-            Logger.log(ex);
+            log("Error reading object from socket!");
+            log(ex);
         }
 
         return null;
@@ -97,8 +71,8 @@ public class Serializer
         }
         catch (Exception ex)
         {
-            Logger.log("Error writing object to socket!");
-            Logger.log(ex);
+            log("Error writing object to socket!");
+            log(ex);
         }
     }
 }

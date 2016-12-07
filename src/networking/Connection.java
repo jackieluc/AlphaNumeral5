@@ -5,11 +5,6 @@ import networking.commands.Command;
 import java.io.IOException;
 import java.net.Socket;
 
-import static debug.Logger.log;
-
-/**
- * Created by Ahmed on 11/14/2016.
- */
 public class Connection
 {
     protected Socket socket;
@@ -47,13 +42,13 @@ public class Connection
         }
     }
 
-    public void sendSerialized(byte[] bytes) throws IOException
-    {
-        synchronized (this)
-        {
-            socket.getOutputStream().write(bytes);
-        }
-    }
+//    public void sendSerialized(byte[] bytes) throws IOException
+//    {
+//        synchronized (this)
+//        {
+//            socket.getOutputStream().write(bytes);
+//        }
+//    }
 
     public void close() throws IOException
     {

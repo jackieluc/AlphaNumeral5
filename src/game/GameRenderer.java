@@ -1,15 +1,13 @@
 package game;
 
 import asciiPanel.AsciiPanel;
-import debug.Logger;
 
 import javax.swing.*;
 import java.awt.event.KeyListener;
 import java.util.HashMap;
 
-/**
- * Created by Ahmed on 11/7/2016.
- */
+import static debug.Logger.log;
+
 public class GameRenderer extends JFrame implements Runnable
 {
     public static GameRenderer current;
@@ -22,11 +20,8 @@ public class GameRenderer extends JFrame implements Runnable
     public GameRenderer()
     {
         super();
-        //
-        current = this;
-        //
+
         isRunning = true;
-        // Add AsciiPanel to JFrame
         terminal = new AsciiPanel();
         this.add(terminal);
         this.pack();
@@ -36,7 +31,7 @@ public class GameRenderer extends JFrame implements Runnable
 
     public void redraw()
     {
-        synchronized (GameState.current)
+        synchronized (GameState.getInstance())
         {
             needsRedrawing = true;
         }
@@ -72,7 +67,7 @@ public class GameRenderer extends JFrame implements Runnable
             {
                 if (needsRedrawing)
                 {
-                    synchronized (GameState.current)
+                    synchronized (GameState.getInstance())
                     {
                         drawMap();
                         drawPlayers();
@@ -87,11 +82,11 @@ public class GameRenderer extends JFrame implements Runnable
         }
         catch (Exception ex)
         {
-            Logger.log("Error in renderer thread!");
-            Logger.log(ex);
+            log("Error in renderer thread!");
+            log(ex);
         }
 
-        Logger.log("Renderer closed...");
+        log("Renderer closed...");
 
         // Close everything
         this.dispose();
@@ -99,23 +94,22 @@ public class GameRenderer extends JFrame implements Runnable
 
     private void drawMap()
     {
-        Map map = GameState.getInstance().map;
+        Map map = GameState.getInstance().getMap();
 
         for (int x = 0; x < map.getWidth(); x++)
         {
             for (int y = 0; y < map.getHeight(); y++)
-            {
                 terminal.write(map.getTile(x, y), x, y);
-            }
         }
     }
 
     private void drawPlayers()
     {
-    	char letter = 'a';
-    	synchronized (GameState.current)
+    	char letter;
+
+    	synchronized (GameState.getInstance())
     	{
-	        HashMap<String,Player> players = GameState.current.players;
+	        HashMap<String,Player> players = GameState.getInstance().getPlayers();
 	
 	        for (Player p : players.values())
 	        {

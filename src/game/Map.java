@@ -1,16 +1,11 @@
 package game;
 
-import debug.Logger;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import asciiPanel.AsciiPanel;
+import static debug.Logger.log;
 
-/**
- * Created by Ahmed on 11/8/2016.
- */
 public class Map
 {
     private int width, height;
@@ -58,17 +53,21 @@ public class Map
                 line = sc.nextLine();
 
                 for (int x = 0; x < line.length(); x++)
-                {
                     tiles[y][x] = line.charAt(x);
-                }
             }
         }
         catch (IOException ex)
         {
-            Logger.log("Error loading world map!");
-            Logger.log(ex);
+            log("Error loading world map!");
+            log(ex);
         }
     }
+
+    /**
+     * @param x - x position of player
+     * @param y - y position of player
+     * @return - true if it is inside the map, false otherwise
+     */
     public boolean insideMap(int x, int y)
     {
         if (x > 0 && x < width-1)
@@ -79,18 +78,26 @@ public class Map
 
         return false;
     }
+
+
+    /**
+     * @param x - x position of player
+     * @param y - y position of player
+     * @return - true if it is valid, false otherwise
+     */
     public boolean validMove(int x, int y)
     {
-    	HashMap<String,Player> players = GameState.current.players;
-    	 for (Player p : players.values())
-         {
-             if (p.x == x && p.y == y)
-            	 return false;
-         }
-    	
-        if(!insideMap(x, y))
-            return false;
+    	HashMap<String,Player> players = GameState.getInstance().getPlayers();
+        for (Player p : players.values())
+        {
+            // If the values are not consistent, return false
+            if (p.x == x && p.y == y)
+                return false;
+        }
 
+        // If it is outside of the map, return false
+        if (!insideMap(x, y))
+            return false;
 
         return true;
     }
