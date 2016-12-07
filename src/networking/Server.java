@@ -53,16 +53,16 @@ public class Server implements Runnable
 
 		public ClientConnection(Server server, Socket socket)
 		{
-            this.socket = socket;
+//            this.socket = socket;
             //
-            sendMasterSignal();
+//            sendMasterSignal();
             //
-            serializer = new Serializer(socket);
+            super.serializer = new Serializer(socket);
 
 			// reset username
 			this.username = null;
 			// set vars
-			this.server = server;
+//			this.server = server;
 
 			// add to list of clients
 			clients.add(this);
@@ -78,16 +78,18 @@ public class Server implements Runnable
 			//System.err.println("backup>> "+ backup);
 			// Tell the user to register (no groupCommands will be accepted until successful registration)
 			serializer.writeToSocket(new RegisterUserCommand(null));
-
+            Logger.log("Sent register user command");
 			// Wait for groupCommands from client
 			while ((command = (Command) serializer.readFromSocket()) != null)
 			{
 				
 				//
-				log("Command recieved from " + socket.getRemoteSocketAddress() + " of type " + command);
+				log("Command received from " + proxySocket.getRemoteSocketAddress() + " of type " + command);
 				//
+                Logger.log("BEFORE: " + command.getClass().toString());
 				if (command.verify())
 				{
+                    Logger.log("AFTER: " + command.getClass().toString());
 					backup(command);
 					command.updateState();
 					command.updateServer(server, this);
@@ -205,21 +207,42 @@ public class Server implements Runnable
 
     public void makePrimary(String proxyIP)
     {
-        Socket socket = null;
-        try {
-            socket = new Socket(proxyIP, PROXYPORT);
-        } catch (IOException e) {
-            e.printStackTrace();
+        System.out.println("This server is the primary");
+//        try {
+//            this.proxySocket = new Socket(proxyIP, PROXYPORT);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
+        executorService = Executors.newCachedThreadPool();
+        serverSocket = createServerSocket();
+//        if (serverSocket != null)
+//        {
+        while (true)
+        {
+            log("Waiting for connection...");
+            try{
+                proxySocket = serverSocket.accept();
+                ClientConnection clientConnection = new ClientConnection(this, proxySocket);
+                executorService.submit(clientConnection);
+            }catch (Exception ex)
+            {
+                log("Error in server loop!");
+                log(ex);
+            }
         }
+//        }
 
 //        while (true)
 //        {
 //            log("Waiting for connection...");
 //            try{
-                ClientConnection clientConnection = new ClientConnection(this, socket);
-                Thread connectToProxy = new Thread(clientConnection);
-                connectToProxy.start();
+/////////
+//                ClientConnection clientConnection = new ClientConnection(this, proxySocket);
+//                Thread connectToProxy = new Thread(clientConnection);
+//                connectToProxy.start();
 //                executorService.submit(clientConnection);
+/////////
 //            }catch (Exception ex)
 //            {
 //                log("Error in server loop!");
@@ -282,7 +305,7 @@ public class Server implements Runnable
 		catch (Exception ex)
 		{
 			
-			log("Error creating server socket! at "+port);
+			log("Error creating server socket! at " + port);
 			log(ex);
 		}
 
@@ -348,8 +371,9 @@ public class Server implements Runnable
 
 
        ///////////////
-        else{
-        	log("**** no primary found, starting server as primary ****");
+       else
+       {
+            log("**** no primary found, starting server as primary ****");
         	executorService = Executors.newCachedThreadPool();
         	serverSocket = createServerSocket();
         	if (serverSocket != null)
@@ -368,9 +392,7 @@ public class Server implements Runnable
 					}
 				}
 			}
-
-        }
-
+       }
     }
 
 

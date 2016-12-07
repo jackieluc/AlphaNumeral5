@@ -54,6 +54,7 @@ public class Client implements Runnable
             return;
         }
 
+        log("Connected to proxy.");
         // Create a serializer for this socket
         serializer = new Serializer(socket);
 
@@ -61,14 +62,10 @@ public class Client implements Runnable
         Command command;
         while ((command = (Command) serializer.readFromSocket()) != null)
         {
-            //
-            if (command != null)
-            {
-                log("Command recieved of type " + command);
+            log("Command received of type " + command);
 
-                command.updateState();
-                command.updateClient(this);
-            }
+            command.updateState();
+            command.updateClient(this);
         }
         try {
 			Thread.sleep(5000);
@@ -104,10 +101,10 @@ public class Client implements Runnable
 //        ServerList serverList = new ServerList(serverPort);
 
         //connect to the proxy
-        Socket socket = null;
+//        Socket socket = null;
         try
         {
-            socket = new Socket(proxyIP, PROXYPORT);
+            this.socket = new Socket(proxyIP, PROXYPORT);
         }
         catch (IOException e)
         {

@@ -26,7 +26,7 @@ public class ProxyThread extends Thread{
 			while(true) {
 				// Get command from receiver
 				command = in.readObject();
-				System.out.println("sender: " + sender_address + "    receiver: " + receiver_address + "    command: " + command.toString());
+				System.out.println("sender: " + sender_address + "    receiver: " + receiver_address + "    command: " + command.getClass().toString());
 
 				// Send command to server
 				out.writeObject(command);
