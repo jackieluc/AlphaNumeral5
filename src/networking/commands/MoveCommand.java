@@ -40,16 +40,16 @@ public class MoveCommand extends Command
     @Override
     public void updateState()
     {
-        synchronized (GameState.current)
+        synchronized (GameState.getInstance())
         {
             // Grab the player from the game state
-            Player player = GameState.current.players.get(username);
+            Player player = GameState.getInstance().getPlayers().get(username);
 
             // If player doesn't exist
             if (player == null)
             {
                 player = new Player(username);
-                GameState.current.players.put(username, player);
+                GameState.getInstance().getPlayers().put(username, player);
                 log("Created new player " + username);
             }
 

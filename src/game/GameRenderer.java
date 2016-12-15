@@ -20,6 +20,7 @@ public class GameRenderer extends JFrame implements Runnable
     public GameRenderer()
     {
         super();
+        current = this;
 
         isRunning = true;
         terminal = new AsciiPanel();

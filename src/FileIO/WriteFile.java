@@ -51,7 +51,7 @@ public class WriteFile
             BufferedWriter bw = new BufferedWriter(fw);
 
             //get the player's position to write to disk
-            synchronized (GameState.current) {
+            synchronized (GameState.getInstance()) {
                 Player player = GameState.getInstance().getPlayers().get(username);
                 bw.write(player.x + " " + player.y);
             }

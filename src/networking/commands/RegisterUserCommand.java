@@ -11,9 +11,6 @@ import networking.Server;
 import java.util.HashMap;
 import java.util.Scanner;
 
-import static game.GameState.current;
-
-
 /**
  * Created by Ahmed on 11/8/2016.
  */
@@ -50,7 +47,7 @@ public class RegisterUserCommand extends Command
                 ReadFile playerFile = new ReadFile(username);
 
                 // get the player if it exists on the server
-                if(GameState.getInstance().players.containsKey(username))
+                if(GameState.getInstance().getPlayers().containsKey(username))
                 {
                 	updatePlayer(server, username);
                     Logger.log("Welcome back " + username + "!");
@@ -68,7 +65,7 @@ public class RegisterUserCommand extends Command
 
                     synchronized (GameState.getInstance())
                     {
-                        GameState.getInstance().players.put(username, player);
+                        GameState.getInstance().getPlayers().put(username, player);
                     }
 
                     updatePlayer(server, username);
@@ -107,7 +104,7 @@ public class RegisterUserCommand extends Command
     {
     	synchronized (GameState.getInstance())
     	{
-	    	Player player = GameState.getInstance().players.get(username);
+	    	Player player = GameState.getInstance().getPlayers().get(username);
 	        MoveCommand moveCommand = new MoveCommand(username, player.x, player.y);
 	        server.sendAll(moveCommand);
     	}
@@ -115,7 +112,7 @@ public class RegisterUserCommand extends Command
 
     private void getExistingPlayers(Server.ClientConnection clientConnection)
     {
-        for (HashMap.Entry<String,Player> p : GameState.getInstance().players.entrySet())
+        for (HashMap.Entry<String,Player> p : GameState.getInstance().getPlayers().entrySet())
         {
             if (!p.getKey().equals(username))
             {

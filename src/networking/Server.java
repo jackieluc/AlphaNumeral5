@@ -160,7 +160,7 @@ public class Server implements Runnable
         {
         	synchronized (GameState.getInstance())
         	{
-	            for (HashMap.Entry<String, Player> p : GameState.current.players.entrySet())
+	            for (HashMap.Entry<String, Player> p : GameState.getInstance().getPlayers().entrySet())
 	                send(new MoveCommand(p.getKey(), p.getValue().x, p.getValue().y));
         	}
         }

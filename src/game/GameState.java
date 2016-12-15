@@ -20,7 +20,7 @@ public class GameState
     /**
     * Get the singleton instance
     */
-    public static synchronized GameState getInstance() {
+    public static GameState getInstance() {
         return instance;
     }
 

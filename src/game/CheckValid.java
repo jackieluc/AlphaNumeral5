@@ -20,14 +20,11 @@ public class CheckValid {
 		int right = 39;
 		int left = 37;
 		
-		if (playerPosition > width-3 && e.getKeyCode() == right){
-			System.err.println("inside if");
+		if (playerPosition > width-3 && e.getKeyCode() == right)
 			return false;
-			}
-		else if (playerPosition == 1 && e.getKeyCode() == left){
-			System.err.println("inside else");
+		else if (playerPosition == 1 && e.getKeyCode() == left)
 			return false;
-		}
+
 		return true;
 	}
 	
